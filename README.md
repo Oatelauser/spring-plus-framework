@@ -23,7 +23,7 @@
 <dependency>
     <groupId>io.github.oatelauser</groupId>
     <artifactId>spring-plus-web</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
