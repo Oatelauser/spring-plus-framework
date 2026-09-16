@@ -49,7 +49,10 @@ ApiClient github = ApiClient.builder()
 - classpath 存在 `MeterRegistry` 时自动为**所有** ApiClient Bean（含业务自建）注入 `api.client.requests` 指标
 - httpclient5 为 provided 可选引擎，缺席时自动降级
 
-## Redis 工具
+## Redis 工具（含批量护栏，1.1.0+）
+
+- `batchGet`/`batchDelete(pattern)` 的 pattern **必须包含实质前缀**（首个 `*` 前有字母数字，如 `user:*`）——纯通配（`*`/`*:*`）直接拒绝，防全库 SCAN/删除
+- `batchGet` 单次返回上限默认 **1000** 条（`setMaxBatchGetResults` 可调），超限 fail-fast 提示收紧 pattern
 
 ```java
 // RedisStringOperation 由自动配置注入（容器存在 StringRedisTemplate 时生效）

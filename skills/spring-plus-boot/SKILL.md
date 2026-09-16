@@ -63,6 +63,7 @@ spring-plus:
 - `uri` / `queryParam` 禁止拼接外部输入（SSRF 主路径）；回调/Webhook/抓取类调用必须开 `spring-plus.client.ssrf.*` 并配置 allowlist
 - 不要开启 `allow-insecure` 用于生产（信任所有证书）
 - 不要在业务代码里直接操作 `StringRedisTemplate` 完成本框架已封装的原子操作
+- Redis 批量 pattern 禁止拼外部输入；纯通配（`*`）已被护栏拒绝，不要试图绕过
 - 不要把 `ShutdownHook` 注册为普通 `@PostConstruct` 逻辑（停机顺序由 handler 保证）
 
 ## 已知注意事项
