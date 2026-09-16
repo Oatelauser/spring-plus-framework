@@ -185,6 +185,10 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
+                            <!-- 示例模块不发布（按 artifactId 匹配；其缺 sources/javadoc 会令 bundle 整体校验被拒） -->
+                            <excludeArtifacts>
+                                <artifactId>spring-boot-web-example</artifactId>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                     <plugin>
