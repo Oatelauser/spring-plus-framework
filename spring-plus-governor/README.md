@@ -47,5 +47,8 @@ public SimpleResponse<Void> pay(@Valid @RequestBody PayCmd cmd) { ... }
 
 ## 已知注意事项
 
+- 匿名/IP 主体只适合单机低风险场景（NAT 下不同用户共享指纹会互相误杀）；多租户必须自定义键策略加租户维度，集群必须 Redis
+- `InMemoryIdempotentStore` 默认容量上限 10 万条（构造器可调），满载 fail-closed 拒绝新 key（防无界增长）
+
 - 内存存储仅适用单实例部署；集群部署必须引入 spring-data-redis（provided 依赖不传递）
 - 幂等拒绝的响应码默认走 `ClientStatus` 的重复提交语义，可经全局异常体系自定义映射

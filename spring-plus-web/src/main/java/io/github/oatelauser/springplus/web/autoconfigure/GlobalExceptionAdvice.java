@@ -331,14 +331,35 @@ public class GlobalExceptionAdvice {
     // ====================== 兜底异常处理 ======================
 
     /**
+     * Spring Security 拒绝异常的类名前缀（web 模块不依赖 spring-security，按类名透传）：
+     * org.springframework.security.access.AccessDeniedException
+     * org.springframework.security.authorization.AuthorizationDeniedException（其子类）
+     */
+    private static final String[] SECURITY_DENIED_CLASSES = {
+            "org.springframework.security.access.AccessDeniedException",
+            "org.springframework.security.authorization.AuthorizationDeniedException"
+    };
+
+    /**
      * 兜底异常处理：不构造默认描述，交给 Mapper 链（异常类注解 / ServerStatus / 兜底）。
      * <p>
      * 注意：{@code HandlerMethod} 在 Filter / 静态资源 / 请求映射阶段异常时可能为 null，
      * 引擎会从请求属性自行解析。
+     * <p>
+     * Spring Security 的拒绝异常（403 语义）必须原样抛出：被本兜底捕获并渲染成
+     * 200 + 系统错误会吞掉 HTTP 语义；rethrow 后由 Security 的
+     * {@code ExceptionTranslationFilter} / 方法级 denied handler 翻译为 403。
      */
     @ExceptionHandler(Exception.class)
     public Object handleException(Exception ex,
             HttpServletRequest request, HttpServletResponse response) {
+        for (Class<?> type = ex.getClass(); type != null; type = type.getSuperclass()) {
+            for (String denied : SECURITY_DENIED_CLASSES) {
+                if (denied.equals(type.getName())) {
+                    throw ex instanceof RuntimeException runtime ? runtime : new RuntimeException(ex);
+                }
+            }
+        }
         return this.engine.dispatchFallback(ex, request, response);
     }
 

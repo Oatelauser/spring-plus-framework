@@ -1,5 +1,12 @@
 # spring-plus-security
 
+> ⚠️ **安全红线（引入本模块前必读）**
+>
+> 1. 本模块**只做授权**（注解声明"需要什么角色/权限"），**不做认证**（登录、token 解析、会话）。认证链路必须由业务项目自建。
+> 2. **必须自配 `SecurityFilterChain` 且默认 `denyAll`，放行走显式白名单**——没有这条，所有接口对公网裸奔（引几个注解 ≠ 安全）。
+> 3. 最小可用配置与演示账号见 [examples 的 SecurityExampleConfig](../examples/spring-boot-web-example/src/main/java/io/github/oatelauser/springplus/example/config/SecurityExampleConfig.java)。
+> 4. `@RequiresRole(role = {})` / `@RequiresPermission` 空 source/action 属配置错误：**启动期直接失败**（fail-closed），不要试图绕过。
+
 声明式鉴权域：以注解表达角色与权限要求，替代 Spring Security 的 SpEL 配置（`@PreAuthorize("@ss.hasPermission('x')")` 风格）。
 
 ## 能力清单

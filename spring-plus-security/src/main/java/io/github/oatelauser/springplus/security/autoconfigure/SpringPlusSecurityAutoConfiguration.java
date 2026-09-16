@@ -50,6 +50,15 @@ public class SpringPlusSecurityAutoConfiguration {
     }
 
     /**
+     * 授权注解启动期校验器（fail-closed）：空角色/空权限配置在启动期失败，
+     * 而非运行期放行（@RequiresRole(role={})）或运行期 500（@RequiresPermission 空属性）
+     */
+    @Bean
+    public RequiresAnnotationValidator requiresAnnotationValidator() {
+        return new RequiresAnnotationValidator();
+    }
+
+    /**
      * 自定义前置权限方法拦截器
      * <p>
      * 替代{@link org.springframework.security.access.prepost.PreAuthorize}机制
@@ -59,9 +68,11 @@ public class SpringPlusSecurityAutoConfiguration {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public AuthorizationManagerBeforeMethodInterceptor preAuthorizeMethodInterceptor(
-            ObjectProvider<List<AnnotationAuthorizer>> authorizationManagers) {
+            RequiresRoleAuthorizer requiresRoleAuthorizer,
+            RequiresPermissionAuthorizer requiresPermissionAuthorizer,
+            ObjectProvider<AnnotationAuthorizer> authorizationManagers) {
         CompositeAuthorizationManager authorizationManager = new CompositeAuthorizationManager(
-                authorizationManagers.getIfAvailable(List::of));
+                collectAuthorizers(requiresRoleAuthorizer, requiresPermissionAuthorizer, authorizationManagers));
         Pointcut pointcut = authorizationManager.forAllAnnotations();
         AuthorizationManagerBeforeMethodInterceptor interceptor =
                 new AuthorizationManagerBeforeMethodInterceptor(pointcut, authorizationManager);
@@ -81,9 +92,11 @@ public class SpringPlusSecurityAutoConfiguration {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public AuthorizationManagerAfterMethodInterceptor postAuthorizeMethodInterceptor(
-            ObjectProvider<List<AnnotationAuthorizer>> authorizationManagers) {
-        CompositePostAuthorizationManager authorizationManager =  new CompositePostAuthorizationManager(
-                authorizationManagers.getIfAvailable(List::of));
+            RequiresRoleAuthorizer requiresRoleAuthorizer,
+            RequiresPermissionAuthorizer requiresPermissionAuthorizer,
+            ObjectProvider<AnnotationAuthorizer> authorizationManagers) {
+        CompositePostAuthorizationManager authorizationManager = new CompositePostAuthorizationManager(
+                collectAuthorizers(requiresRoleAuthorizer, requiresPermissionAuthorizer, authorizationManagers));
         Pointcut pointcut = authorizationManager.forAllAnnotations();
         AuthorizationManagerAfterMethodInterceptor interceptor =
                 new AuthorizationManagerAfterMethodInterceptor(pointcut, authorizationManager);
@@ -91,6 +104,21 @@ public class SpringPlusSecurityAutoConfiguration {
         eventPublisherProvider.ifAvailable(interceptor::setAuthorizationEventPublisher);
         interceptor.setOrder(AuthorizationInterceptorsOrder.POST_AUTHORIZE.getOrder());
         return interceptor;
+    }
+
+    /**
+     * 汇总授权器：内置两个（显式参数，保证存在且确定序）+ 业务扩展（provider 流式收集）。
+     * <p>
+     * 此前 {@code ObjectProvider<List>} 解析：advisor 检索触发早实例化时可能解析为空列表，
+     * 经 {@code forAnnotations(空)} 得到 null pointcut 使拦截器构造崩溃；显式参数根除该时序问题。
+     */
+    private static List<AnnotationAuthorizer> collectAuthorizers(RequiresRoleAuthorizer roleAuthorizer,
+            RequiresPermissionAuthorizer permissionAuthorizer, ObjectProvider<AnnotationAuthorizer> provider) {
+        List<AnnotationAuthorizer> authorizers = new java.util.ArrayList<>(
+                provider.stream().filter(a -> a != roleAuthorizer && a != permissionAuthorizer).toList());
+        authorizers.add(roleAuthorizer);
+        authorizers.add(permissionAuthorizer);
+        return authorizers;
     }
 
 }

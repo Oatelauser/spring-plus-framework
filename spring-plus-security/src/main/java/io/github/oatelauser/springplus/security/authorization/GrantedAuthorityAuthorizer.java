@@ -33,6 +33,11 @@ public abstract class GrantedAuthorityAuthorizer implements AnnotationAuthorizer
         Annotation annotation = mi.getAnnotation();
         Method specificMethod = mi.getSpecificMethod();
         Set<String> authority = this.processAuthorizedAnnotation(annotation, specificMethod);
+        // fail-closed（CWE-862）：注解存在但解析为空权限 = 配置错误（如 @RequiresRole(role = {})），
+        // 必须拒绝而非放行；annotation 为 null 表示本授权器不处理该调用，走原语义
+        if (annotation != null && authority.isEmpty()) {
+            return AnnotationAuthorizationDecision.deny(Set.<String>of());
+        }
         // 开始校验权限
         return this.verify(authority, grantedAuthorities);
     }

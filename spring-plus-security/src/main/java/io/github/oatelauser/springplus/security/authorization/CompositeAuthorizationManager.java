@@ -87,7 +87,18 @@ public class CompositeAuthorizationManager implements AuthorizationManager<Metho
         return forAnnotations(annotationSet);
     }
 
+    /** 永不匹配切点：空授权器集合时拦截器空转（如无后置语义授权器时注册后置拦截器，合法状态） */
+    private static final Pointcut NEVER_MATCH = new org.springframework.aop.support.StaticMethodMatcherPointcut() {
+        @Override
+        public boolean matches(java.lang.reflect.Method method, Class<?> targetClass) {
+            return false;
+        }
+    };
+
     static Pointcut forAnnotations(Collection<Class<? extends Annotation>> annotations) {
+        if (annotations.isEmpty()) {
+            return NEVER_MATCH;
+        }
         ComposablePointcut pointcut = null;
         for (Class<? extends Annotation> annotation : annotations) {
             if (pointcut == null) {

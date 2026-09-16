@@ -35,6 +35,15 @@ mvn spring-boot:run
 
 `IdempotentController`：`@Idempotent` / `@RepeatSubmit` 幂等防重演示。
 
+`SecureController`（`/secure`，声明式鉴权演示，认证走 HTTP Basic）：
+
+| 端点 | 演示 | 验证 |
+|---|---|---|
+| `GET /secure/admin` | `@RequiresAdminRole` 超管短路 | `curl -u admin:admin123 .../secure/admin` → 00000；`-u user:user123` → 403；无凭据 → 401 |
+| `GET /secure/profile` | `@RequiresRole("USER")` | `curl -u user:user123 ...` → 00000 |
+
+安全基线：`SecurityExampleConfig`——默认 `denyAll` + 显式白名单（`/v2-test/**`、`/idempotent-test/**` 免认证，`/secure/**` 需认证），是 V08 红线的对照样例。
+
 ## 辅助类索引
 
 | 类 | 演示点 |

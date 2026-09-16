@@ -3,6 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.oatelauser/spring-plus-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.oatelauser/spring-plus-web)
 [![CI](https://github.com/Oatelauser/spring-plus-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/Oatelauser/spring-plus-framework/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Changelog](https://img.shields.io/badge/changelog-1.0.1%20dev-blue)](CHANGELOG.md)
 
 面向 Maven 中央仓库发布的 Spring 公共库：为 Spring Web / Spring Boot 应用提供**统一响应、全局异常处理（JSON/SSE/NDJSON 三协议）、流式响应写入器、分页、服务治理（幂等防重）、声明式鉴权、内存 SQL 查询**能力。
 

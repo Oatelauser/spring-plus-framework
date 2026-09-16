@@ -42,6 +42,7 @@ public class UserRow {
 engine.register("users", userRows);
 
 try (MemoryQuerySession session = engine.openSession()) {
+    // 含外部输入的查询一律绑参（防注入），注入串只会作为数据比较
     List<UserRow> result = session.query(
             "SELECT id, name FROM users WHERE room = ? ORDER BY id", "A-101");
 }

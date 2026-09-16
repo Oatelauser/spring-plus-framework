@@ -1,7 +1,6 @@
 package io.github.oatelauser.springplus.security.authorization;
 
 import io.github.oatelauser.springplus.security.annotation.RequiresPermission;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
@@ -19,7 +18,6 @@ import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMerg
  * @date 2024-10-17
  * @since 1.0
  */
-@Component
 @SuppressWarnings("unchecked")
 public class RequiresPermissionAuthorizer extends GrantedAuthorityAuthorizer {
 

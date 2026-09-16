@@ -35,6 +35,10 @@
             <groupId>io.github.oatelauser</groupId>
             <artifactId>spring-plus-governor</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.github.oatelauser</groupId>
+            <artifactId>spring-plus-security</artifactId>
+        </dependency>
 
         <!-- Boot 4 Web MVC 聚合模块（替代旧 spring-boot-starter-web） -->
         <dependency>

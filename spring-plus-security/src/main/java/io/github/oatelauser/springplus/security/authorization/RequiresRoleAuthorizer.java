@@ -4,7 +4,6 @@ import io.github.oatelauser.springplus.security.annotation.RequiresAdminRole;
 import io.github.oatelauser.springplus.security.annotation.RequiresRole;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -26,7 +25,6 @@ import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMerg
  * @see RequiresAdminRole
  * @since 1.0
  */
-@Component
 @SuppressWarnings("unchecked")
 public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer {
 

@@ -52,11 +52,13 @@ public interface Authorizer {
      * @return true-系统管理员
      */
     static boolean determineAdminRole(Collection<GrantedAuthority> grantedAuthorities) {
-        if (!CollectionUtils.isEmpty(grantedAuthorities) &&
-                grantedAuthorities instanceof List<GrantedAuthority> authorities) {
-            return ROLE_SUPER_ADMIN.equals(authorities.getFirst().getAuthority());
+        if (CollectionUtils.isEmpty(grantedAuthorities)) {
+            return false;
         }
-        return false;
+        // 不限定集合类型与顺序：Spring Security 常规 User 的 authorities 是 Set，
+        // 按元素匹配而非 instanceof List + 首元素（顺序敏感的权限判断不可靠）
+        return grantedAuthorities.stream()
+                .anyMatch(authority -> ROLE_SUPER_ADMIN.equals(authority.getAuthority()));
     }
 
 }

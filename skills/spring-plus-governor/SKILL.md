@@ -51,6 +51,9 @@ public SimpleResponse<Void> pay(@Valid @RequestBody PayCmd cmd) { ... }
 
 ## 已知注意事项
 
+- **主体维度红线**：匿名/IP 主体（FingerprintKeyStrategy 降级链）在网关/出口 NAT 下不同用户共享指纹——多租户/集群必须自定义 `IdempotentKeyStrategy` 加租户维度并使用 Redis 存储
+- 内存存储默认容量 10 万条（构造器可调），满载后 fail-closed 拒绝新 key（防无界增长），不是 bug
+
 - 织入方式是编程式 AOP（MethodInterceptor + Advisor），与 MVC 拦截器无关
 - Redis 存储探测按类名反射：无 Redis 依赖时模块可安全加载，自动回落内存存储
 - 幂等拒绝响应走全局异常体系的 `ClientStatus` 重复提交语义，可用异常注解自定义

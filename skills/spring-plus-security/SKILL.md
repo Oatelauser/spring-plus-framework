@@ -17,6 +17,13 @@ description: 在已引入 io.github.oatelauser:spring-plus-security 的项目中
 
 本模块只做**授权**声明与校验桥接；认证（登录、token 解析、会话）由业务项目的 Security Filter 链提供。
 
+## 安全红线（最高优先级）
+
+- **必须自配 `SecurityFilterChain` 且默认 `denyAll`，放行走显式白名单**——本模块不会替你关上大门，没配 FilterChain 的应用所有接口裸奔
+- `@RequiresRole(role = {})` 与 `@RequiresPermission` 空 source/action 是配置错误：框架在**启动期直接失败**（fail-closed），不要捕获或绕过这个失败
+- 授权语义 fail-closed：注解存在但解析为空权限 → 拒绝（不是放行）
+- 参照基线：examples 的 `SecurityExampleConfig`（denyAll + 白名单 + 演示账号）
+
 ## 优先复用的公开类型
 
 注解（`io.github.oatelauser.springplus.security.annotation`）：

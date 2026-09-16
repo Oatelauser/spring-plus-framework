@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -30,7 +29,6 @@ import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMerg
  * @date 2024-10-17
  * @since 1.0
  */
-@Component
 @SuppressWarnings("unchecked")
 public class CompositeAnnotationAuthorizer implements AnnotationAuthorizer, ApplicationContextAware {
 
