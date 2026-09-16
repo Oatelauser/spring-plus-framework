@@ -94,6 +94,15 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- 示例不发布：central-publishing 不认 maven.deploy.skip（其校验要求 bundle 内
+                 每个组件都带 sources/javadoc，示例进入 bundle 会整包被拒） -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <configuration>
+                    <skipPublishing>true</skipPublishing>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
