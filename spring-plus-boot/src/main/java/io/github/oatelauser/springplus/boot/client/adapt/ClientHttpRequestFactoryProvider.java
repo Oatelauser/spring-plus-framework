@@ -96,8 +96,11 @@ public class ClientHttpRequestFactoryProvider implements EnvironmentAware {
                             .build());
         });
 
-        // ② HttpClient 级别：驱逐 + 代理
+        // ② HttpClient 级别：驱逐 + 代理 + 跨主机重定向剥凭据
         builder = builder.withHttpClientCustomizer(hc -> {
+            if (settings.getFollowRedirect() && settings.getStripCredentialsOnCrossHostRedirect()) {
+                hc.addRequestInterceptorLast(CrossHostCredentialStrippingInterceptor.INSTANCE);
+            }
             if (hc5.getEvictExpiredConnections()) {
                 hc.evictExpiredConnections();
             }

@@ -66,6 +66,24 @@ application.yml 中的敏感配置以 `ENC(密文)` 书写，`EncryptedPropertyE
 
 `WebServerPostProcessor` 在 Web 容器就绪前触发容器中所有 `StartupProcess`（接口在本模块 `boot.lifecycle` 包）；`SmartGracefulShutdownHandler` 在停机时逆序执行 `ShutdownHook`，先摘流量后关资源。
 
+## SSRF 防护（1.1.0+）
+
+外部输入参与构造 `uri` 的调用（回调、Webhook、抓取）建议开启：
+
+```yaml
+spring-plus:
+  client:
+    base-url: https://api.example.com
+    ssrf:
+      enabled: true                    # 默认 false（兼容）
+      allowed-hosts: [api.example.com] # 后缀匹配；为空仅私网拦截
+      deny-private-network: true       # 环回/私网/链路本地/保留地址，解析失败 fail-closed
+```
+
+- 校验挂在过滤器链首：绝对 URI 覆盖 baseUrl 的注入路径与相对路径（校验 baseUrl 主机）都覆盖
+- 已知局限：DNS rebinding 未做 IP pinning（浅防护）；跨主机重定向凭据剥离仅 HTTP_COMPONENTS 引擎支持（`strip-credentials-on-cross-host-redirect` 默认 true），启用 SSRF 的部署建议该引擎
+- **红线**：`uri`/`queryParam` 禁止拼接外部输入；外部 URL 必须经 allowlist 校验
+
 ## 已知注意事项
 
 - 不配置 `spring-plus.client.base-url` 时不装配默认 ApiClient，多客户端场景一律 `builder()` 自建

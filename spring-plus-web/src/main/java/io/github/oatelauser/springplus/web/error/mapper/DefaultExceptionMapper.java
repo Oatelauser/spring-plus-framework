@@ -21,7 +21,7 @@ import static io.github.oatelauser.springplus.web.response.SystemStatus.INTERNAL
  * <p>
  * 直接把底层异常消息透给前端有安全风险（泄露栈/SQL/内部结构），因此按 {@link GlobalExceptionProperties}：
  * <ul>
- *   <li>{@code showError=true}：透出异常的 localizedMessage（开发 / 排障期，默认 true）。</li>
+ *   <li>{@code showError=true}：透出异常的 localizedMessage（开发 / 排障期显式开启；1.0.1 起默认 false）。</li>
  *   <li>否则若配置了自定义 {@code code/msg}：用业务方指定的兜底文案。</li>
  *   <li>否则：用 {@link SystemStatus#INTERNAL_ERROR} 的标准文案「系统内部错误」。</li>
  * </ul>

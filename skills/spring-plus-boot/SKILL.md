@@ -60,6 +60,7 @@ spring-plus:
 
 ## 不要这样做
 
+- `uri` / `queryParam` 禁止拼接外部输入（SSRF 主路径）；回调/Webhook/抓取类调用必须开 `spring-plus.client.ssrf.*` 并配置 allowlist
 - 不要开启 `allow-insecure` 用于生产（信任所有证书）
 - 不要在业务代码里直接操作 `StringRedisTemplate` 完成本框架已封装的原子操作
 - 不要把 `ShutdownHook` 注册为普通 `@PostConstruct` 逻辑（停机顺序由 handler 保证）

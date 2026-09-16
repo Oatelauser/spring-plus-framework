@@ -2,6 +2,12 @@
 
 本项目的所有显著变更记录于此。格式参照 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
+## [1.1.0] — 未发布（安全加固版）
+
+### 安全增强
+
+- **V09/SEC-004**：ApiClient SSRF 防护——`spring-plus.client.ssrf.*`（enabled / allowed-hosts / deny-private-network，默认关闭保持兼容），请求发出前校验目标主机（绝对 URI 覆盖 baseUrl 的注入路径覆盖），解析失败 fail-closed；跨主机重定向自动剥离 Authorization/Cookie（`strip-credentials-on-cross-host-redirect` 默认开启，仅 HTTP_COMPONENTS 引擎）
+
 ## [1.0.1] — 未发布（安全修复版）
 
 完整对照表见 [docs/security-remediation.md](./docs/security-remediation.md)。

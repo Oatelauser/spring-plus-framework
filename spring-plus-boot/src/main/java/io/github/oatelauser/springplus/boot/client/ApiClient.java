@@ -259,6 +259,14 @@ public class ApiClient extends BaseApiClient {
 
             Assert.notNull(properties, "Either restClient or properties must be set");
             Assert.hasText(properties.getBaseUrl(), "properties.baseUrl must not be null");
+            if (properties.getSsrf().getEnabled()) {
+                // SSRF 防护（默认关闭）：链首校验目标主机（绝对 URI 覆盖 baseUrl 是主注入路径）
+                String baseUrlHost = java.net.URI.create(properties.getFullBaseUrl()).getHost();
+                this.filters.add(0, new io.github.oatelauser.springplus.boot.client.interceptor.SsrfGuardFilter(
+                        properties.getSsrf(), baseUrlHost));
+                log.info("ApiClient: SSRF guard enabled (allowedHosts={}, denyPrivateNetwork={})",
+                        properties.getSsrf().getAllowedHosts(), properties.getSsrf().getDenyPrivateNetwork());
+            }
             if (this.factoryProvider == null) {
                 // 未显式提供 provider 时用默认实例（无 SslBundles；
                 // ssl.bundle 配置在此模式下不可用，需要时请通过 Spring 装配注入）

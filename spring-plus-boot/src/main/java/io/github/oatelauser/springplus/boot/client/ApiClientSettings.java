@@ -49,6 +49,12 @@ public class ApiClientSettings {
     private boolean followRedirect = true;
 
     /**
+     * 跨主机重定向时剥离 Authorization/Cookie 凭据头（防凭据经 30x 泄露给第三方/内网），
+     * 默认 true；仅 HTTP_COMPONENTS 引擎生效。
+     */
+    private boolean stripCredentialsOnCrossHostRedirect = true;
+
+    /**
      * 默认请求头（设到 RestClient 层，不经过 Factory Builder）
      */
     private Map<String, String> defaultHeaders = new LinkedHashMap<>();
@@ -67,6 +73,16 @@ public class ApiClientSettings {
 
     @NestedConfigurationProperty
     private Logging logging = new Logging();
+
+    // ========================= SSRF 防护（默认关闭） =========================
+
+    /**
+     * SSRF 防护（CWE-918）：启用后每个请求发出前校验目标主机（allowlist + 私网拦截）。
+     * <p>
+     * 默认关闭保持兼容；面向公网的回调/Webhook/抓取类调用建议开启。
+     */
+    @NestedConfigurationProperty
+    private Ssrf ssrf = new Ssrf();
 
     @NestedConfigurationProperty
     private Compression compression = new Compression();
@@ -204,6 +220,30 @@ public class ApiClientSettings {
         private int executorThreads = 0;
 
         public enum HttpVersion {HTTP_1_1, HTTP_2}
+    }
+
+    /**
+     * SSRF 防护配置（spring-plus.client.ssrf.*）
+     */
+    @Data
+    public static class Ssrf {
+
+        /**
+         * 是否启用 SSRF 防护，默认 false（兼容）。
+         */
+        private boolean enabled = false;
+
+        /**
+         * 目标主机允许列表（后缀匹配：api.example.com 放行其自身与子域）。
+         * 为空时不做 allowlist 校验（仅私网拦截）。
+         */
+        private java.util.List<String> allowedHosts = new java.util.ArrayList<>();
+
+        /**
+         * 拒绝内网/保留地址（环回、私有、链路本地、未指定、组播），默认 true。
+         * 域名经 DNS 解析后逐地址判定；解析失败 fail-closed 拒绝。
+         */
+        private boolean denyPrivateNetwork = true;
     }
 
 }
