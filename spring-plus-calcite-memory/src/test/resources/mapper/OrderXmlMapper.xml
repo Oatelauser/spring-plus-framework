@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.oatelauser.springplus.calcite.memory.mybatis.OrderXmlMapper">
+
+    <resultMap id="orderMap" type="io.github.oatelauser.springplus.calcite.memory.mybatis.OrderView">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="findByConditions" resultMap="orderMap">
+        SELECT id, user_id, amount, status FROM orders
+        <where>
+            <if test="minAmount != null">AND amount &gt;= #{minAmount}</if>
+            <if test="maxAmount != null">AND amount &lt;= #{maxAmount}</if>
+        </where>
+        ORDER BY id
+    </select>
+
+    <select id="findByIds" resultMap="orderMap">
+        SELECT id, user_id, amount, status FROM orders
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        ORDER BY id
+    </select>
+</mapper>
