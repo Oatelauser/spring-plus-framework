@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.oatelauser</groupId>
+        <artifactId>spring-plus-framework</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <!-- 上级 spring-plus-examples 不是聚合模块，显式指向仓库根 POM -->
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>spring-boot-web-example</artifactId>
+    <name>spring-plus-framework-examples :: spring-boot-web-example</name>
+    <description>Spring Boot 接入示例：统一响应 / 全局异常 / 流式响应 / 幂等防重的标准对照样例</description>
+
+    <properties>
+        <!-- 示例不发布到中央仓库 -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.source.skip>true</maven.source.skip>
+        <maven.gpg.skip>true</maven.gpg.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.oatelauser</groupId>
+            <artifactId>spring-plus-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.oatelauser</groupId>
+            <artifactId>spring-plus-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.oatelauser</groupId>
+            <artifactId>spring-plus-governor</artifactId>
+        </dependency>
+
+        <!-- Boot 4 Web MVC 聚合模块（替代旧 spring-boot-starter-web） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webmvc</artifactId>
+        </dependency>
+
+        <!-- 参数校验（@Valid/@Min + EchoCmd 约束注解） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-validation</artifactId>
+        </dependency>
+
+        <!-- 接口文档注解（@Tag/@Operation） -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

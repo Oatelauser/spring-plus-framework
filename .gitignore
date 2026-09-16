@@ -1,0 +1,13 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.log
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+dependency-reduced-pom.xml
+flattened-pom.xml
