@@ -5,7 +5,7 @@
 
     <groupId>io.github.oatelauser</groupId>
     <artifactId>spring-plus-framework</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>spring-plus-framework</name>
     <description>Spring Web / Spring Boot 能力拓展公共库：统一响应、全局异常处理（JSON/SSE/NDJSON）、流式响应、服务治理（幂等防重）、声明式鉴权、内存 SQL 查询</description>

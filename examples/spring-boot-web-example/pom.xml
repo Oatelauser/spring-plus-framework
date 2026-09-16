@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.oatelauser</groupId>
         <artifactId>spring-plus-framework</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <!-- 上级 spring-plus-examples 不是聚合模块，显式指向仓库根 POM -->
         <relativePath>../../pom.xml</relativePath>
     </parent>

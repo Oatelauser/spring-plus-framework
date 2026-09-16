@@ -1,5 +1,9 @@
 # spring-plus-framework
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.oatelauser/spring-plus-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.oatelauser/spring-plus-web)
+[![CI](https://github.com/Oatelauser/spring-plus-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/Oatelauser/spring-plus-framework/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 面向 Maven 中央仓库发布的 Spring 公共库：为 Spring Web / Spring Boot 应用提供**统一响应、全局异常处理（JSON/SSE/NDJSON 三协议）、流式响应写入器、分页、服务治理（幂等防重）、声明式鉴权、内存 SQL 查询**能力。
 
 基于 **Java 21 + Spring Boot 4.1**（Jackson 3 / `tools.jackson`）构建，不继承 `spring-boot-starter-parent`，与消费方项目的 parent 零冲突。
