@@ -59,7 +59,7 @@ description: 在已引入 spring-plus-framework（io.github.oatelauser:spring-pl
 ## 验证闸门
 
 - 任何修改后跑最小验证：`mvn -pl <模块> compile`；涉及测试的改动跑对应测试类
-- 交付前跑 `mvn clean install`（全仓 192 个测试，约 20 秒）
+- 交付前跑 `mvn clean install`（全仓 224 个测试，约 20 秒）
 
 ## 交付检查清单
 

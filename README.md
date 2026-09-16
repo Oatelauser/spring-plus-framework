@@ -8,6 +8,37 @@
 
 基于 **Java 21 + Spring Boot 4.1**（Jackson 3 / `tools.jackson`）构建，不继承 `spring-boot-starter-parent`，与消费方项目的 parent 零冲突。
 
+## Overview (English)
+
+**spring-plus-framework** is a Maven Central library extending Spring Web / Spring Boot (Java 21, Boot 4.1, Jackson 3) with:
+
+| Module | Provides |
+|---|---|
+| `spring-plus-web` | Unified response (`SimpleResponse`, A0/B0/C0 status codes), global exception handling across **JSON / SSE / NDJSON** protocols, streaming response writers, pagination, validation annotations, runtime assertions (`AssertUtils`) |
+| `spring-plus-boot` | HTTP client (interceptor chain / retry / GZIP / metrics), Redis utilities, config-file encryption (`ENC(...)`), graceful shutdown |
+| `spring-plus-governor` | Idempotency & repeat-submit protection (`@Idempotent` / `@RepeatSubmit`) |
+| `spring-plus-security` | Declarative authorization: `@RequiresRole` / `@RequiresPermission` annotations replacing SpEL |
+| `spring-plus-calcite-memory` | In-memory SQL over POJO/Map/List tables, powered by Apache Calcite |
+
+```xml
+<dependency>
+    <groupId>io.github.oatelauser</groupId>
+    <artifactId>spring-plus-web</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+```java
+@GetMapping("/user")
+public SimpleResponse<User> user(@RequestParam Long id) {
+    User user = userService.get(id);
+    AssertUtils.notNull(user, BusinessStatus.DATA_NOT_EXIST);   // throws ServiceException on failure
+    return SimpleResponse.ok(user);
+}
+```
+
+Boot applications get everything auto-configured — see [examples/spring-boot-web-example](./examples/spring-boot-web-example) (21 endpoints covering the full exception-handling contract). Full documentation below is in Chinese; the API itself (class/method names, this README's tables) is language-neutral.
+
 ## 模块矩阵
 
 | 模块 | 定位 | 依赖 |
@@ -99,7 +130,7 @@ public SimpleResponse<Void> create(@Valid @RequestBody CreateUserCmd cmd) { ... 
 ## 构建与发布
 
 ```bash
-mvn clean install          # 本地构建 + 全量测试（192 个测试）
+mvn clean install          # 本地构建 + 全量测试（224 个测试）
 mvn -P release deploy      # 发布到 Maven Central（需 central 账号与 GPG 密钥）
 ```
 
