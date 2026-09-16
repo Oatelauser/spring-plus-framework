@@ -160,10 +160,10 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler({ TypeMismatchException.class, MethodArgumentTypeMismatchException.class })
     public Object handleTypeMismatchException(TypeMismatchException ex,
             HttpServletRequest request, HttpServletResponse response) {
-        String message = String.format("参数类型错误: %s (期望类型: %s, 实际值: %s)",
+        // 不回显 ex.getValue()：入参原值经响应反射给客户端属于信息泄露（CWE-209/117）
+        String message = String.format("参数类型错误: %s (期望类型: %s)",
                 ex.getPropertyName(),
-                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "未知",
-                ex.getValue());
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "未知");
         ErrorDescriptor descriptor = ErrorDescriptor.of(ClientStatus.PARAMETER_TYPE_ERROR, ex)
                 .message(message).build();
         return this.engine.dispatch(ex, descriptor, request, response);

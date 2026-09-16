@@ -186,6 +186,53 @@ public class MemoryQuerySession implements AutoCloseable {
         }
     }
 
+    /**
+     * 绑参查询（推荐）：SQL 以 {@code ?} 占位、值经参数列表绑定执行，杜绝字符串拼接注入（CWE-89）。
+     * <p>与 {@link #query(String)} 共享语句缓存与超时看门狗；含外部输入的查询一律使用本方法。
+     *
+     * @param sql        带 {@code ?} 占位符的 SQL
+     * @param parameters 与占位符顺序一致的参数值
+     * @return 查询结果
+     */
+    public QueryResult query(String sql, Object... parameters) {
+        return query(sql, java.util.Arrays.asList(parameters));
+    }
+
+    /**
+     * 绑参查询（列表形态）：语义同 {@link #query(String, Object...)}。
+     */
+    public QueryResult query(String sql, List<Object> parameters) {
+        if (sql == null || sql.isBlank()) {
+            throw new SqlException("SQL 不能为空");
+        }
+        List<Object> boundParameters = parameters == null ? List.of() : parameters;
+        if (config.safetyMode() == SqlSafetyMode.RESTRICTED) {
+            SqlAstWhitelist.validate(sql);
+        }
+        long timeoutMillis = config.queryTimeoutMillis();
+        long start = System.nanoTime();
+        MemoryMetrics.Outcome outcome = MemoryMetrics.Outcome.SUCCESS;
+        int rowCount = 0;
+        try {
+            QueryResult result = executeCached(sql, boundParameters);
+            rowCount = result.rowCount();
+            return result;
+        } catch (SQLException e) {
+            if (e instanceof SQLSyntaxErrorException || hasParseError(e)) {
+                outcome = MemoryMetrics.Outcome.ERROR;
+                throw new SqlException("SQL 解析失败: " + e.getMessage(), e);
+            }
+            if (isTimeoutCancellation(e)) {
+                outcome = MemoryMetrics.Outcome.TIMEOUT;
+                throw new QueryTimeoutException("查询超时（" + timeoutMillis + "ms）: " + e.getMessage(), e);
+            }
+            outcome = MemoryMetrics.Outcome.ERROR;
+            throw new ExecutionException("查询执行失败: " + e.getMessage(), e);
+        } finally {
+            metrics.recordQuery(sql, System.nanoTime() - start, rowCount, outcome);
+        }
+    }
+
     /** 会话是否已关闭：底层连接已关闭即视为会话已关闭。 */
     public boolean isClosed() {
         try {

@@ -46,9 +46,12 @@ public class GlobalExceptionProperties {
     private String msg = SERVER_INTERNAL_MSG;
 
     /**
-     * 是否显示详细错误信息（生产环境建议关闭）
+     * 是否显示详细错误信息（未映射异常的原文会透出给客户端，含表名/路径/类名等侦察信息）。
+     * <p>
+     * 默认 {@code false}：与全局异常体系的脱敏约定一致（错误消息不含请求值、堆栈、SQL、类名）。
+     * 本地排障可临时开启，生产环境必须关闭。
      */
-    private boolean showError = true;
+    private boolean showError = false;
 
     /**
      * 日志相关配置（v2.0 新增）。

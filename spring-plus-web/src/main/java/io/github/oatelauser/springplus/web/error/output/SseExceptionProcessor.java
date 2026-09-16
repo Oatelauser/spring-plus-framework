@@ -130,11 +130,16 @@ public class SseExceptionProcessor implements ExceptionOutputProcessor {
         String dataJson = JsonUtils.shared().writeValueAsString(body);
 
         StringBuilder frame = new StringBuilder(dataJson.length() + 64);
+        // SSE 响应拆分防护（CWE-113）：event 名来自注解/配置/bodyCustomizer，注入换行可伪造事件帧
+        String eventName = hint.event();
+        if (eventName.indexOf('\n') >= 0 || eventName.indexOf('\r') >= 0) {
+            eventName = "app-error";
+        }
         if (hint.retry() > 0) {
             // retry 字段（毫秒）：客户端断线重连间隔。
             frame.append("retry: ").append(hint.retry()).append('\n');
         }
-        frame.append("event: ").append(hint.event()).append('\n');
+        frame.append("event: ").append(eventName).append('\n');
         // SSE 协议要求 data 不能内含原始换行——序列化后的 JSON 字符串本身不会有，但万一
         // bodyCustomizer 返回了带 \n 的对象，按 SSE 规范应拆成多行 data:。这里做防御性 escape。
         frame.append("data: ").append(dataJson.replace("\n", "\ndata: ")).append(FRAME_TERMINATOR);

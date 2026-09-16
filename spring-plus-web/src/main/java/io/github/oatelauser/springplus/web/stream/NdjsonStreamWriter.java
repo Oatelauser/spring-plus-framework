@@ -117,6 +117,10 @@ public class NdjsonStreamWriter extends AbstractStreamWriter {
      * @throws IOException IO异常
      */
     public NdjsonStreamWriter writeRawLine(String line) throws IOException {
+        // NDJSON 逐行协议防护：换行符会错位后续记录，fail-fast 优于下游解析错乱
+        if (line.indexOf('\n') >= 0 || line.indexOf('\r') >= 0) {
+            throw new IllegalArgumentException("line 不能包含换行符（NDJSON 单行约束）");
+        }
         this.writeRecord(line.getBytes(StandardCharsets.UTF_8));
         return this;
     }

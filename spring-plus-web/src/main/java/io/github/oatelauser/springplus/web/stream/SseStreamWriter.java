@@ -114,6 +114,7 @@ public class SseStreamWriter extends AbstractStreamWriter {
     }
 
     private SseStreamWriter writeEventInternal(String event, String value) throws IOException {
+        requireSingleLine("event", event);
         byte[] bytes = event.getBytes(StandardCharsets.UTF_8);
         lock.lock();
         try {
@@ -150,6 +151,8 @@ public class SseStreamWriter extends AbstractStreamWriter {
      * @param mediaType 载荷类型（非空），converter 版据此匹配消息转换器
      */
     public SseStreamWriter writeEvent(String id, String event, Object data, MediaType mediaType) throws IOException {
+        requireSingleLine("id", id);
+        requireSingleLine("event", event);
         String text = this.payloadAsString(data, Objects.requireNonNull(mediaType, "mediaType 不能为空"));
         byte[] idBytes = id.getBytes(StandardCharsets.UTF_8);
         byte[] eventBytes = event.getBytes(StandardCharsets.UTF_8);
@@ -175,6 +178,15 @@ public class SseStreamWriter extends AbstractStreamWriter {
      *       （业务自定义转换器生效；显式重载可指定 XML / 自定义文本等任意类型）</li>
      * </ul>
      */
+    /**
+     * SSE 响应拆分防护（CWE-113）：event/id 含换行符可伪造任意事件帧，写入前 fail-fast。
+     */
+    private static void requireSingleLine(String name, String value) {
+        if (value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0) {
+            throw new IllegalArgumentException(name + " 不能包含换行符（SSE 响应拆分防护）: " + value);
+        }
+    }
+
     private String payloadAsString(Object data) throws IOException {
         return this.payloadAsString(data, MediaType.APPLICATION_JSON);
     }
