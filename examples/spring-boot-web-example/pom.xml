@@ -42,6 +42,18 @@
             <artifactId>spring-boot-webmvc</artifactId>
         </dependency>
 
+        <!-- Boot 4 模块化后 webmvc 不带容器：嵌入式 Tomcat（含 web-server 上下文工厂 SPI） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-tomcat</artifactId>
+        </dependency>
+
+        <!-- Jackson 运行时（Boot 4 的 JsonMapper 自动配置模块，web 模块侧为 provided 不传递） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-jackson</artifactId>
+        </dependency>
+
         <!-- 参数校验（@Valid/@Min + EchoCmd 约束注解） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -66,5 +78,23 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 可执行 jar（repackage）+ mvn spring-boot:run 短前缀 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

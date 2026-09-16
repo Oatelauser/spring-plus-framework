@@ -57,11 +57,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- 全局异常处理覆盖 org.springframework.dao 异常族（DataAccessException 等） -->
+        <!-- 全局异常处理覆盖 org.springframework.dao 异常族（DataAccessException 等）。
+             compile：GlobalExceptionAdvice 方法签名直接引用 dao 异常类，必须传递给消费方，
+             否则消费方 classpath 无 spring-tx 时类内省抛 NoClassDefFoundError -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- 本模块自带自动配置（异常处理 / HandlerAdapter / 请求追踪注册） -->

@@ -138,6 +138,9 @@
                     <version>3.16.0</version>
                     <configuration>
                         <release>${java.version}</release>
+                        <!-- Spring 7 移除 LocalVariableTableParameterNameDiscoverer：
+                             保留字节码参数名，@RequestParam/@PathVariatle 按名绑定依赖此配置 -->
+                        <parameters>true</parameters>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>org.projectlombok</groupId>

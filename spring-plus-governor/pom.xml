@@ -60,6 +60,12 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- JsonUtils 静态回退路径引用 Boot jackson 模块（web 侧 provided 不传递），测试补齐 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-jackson</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
