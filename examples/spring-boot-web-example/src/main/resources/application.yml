@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  jackson:
+    # 以下 4 键由 spring-plus-web 的 JacksonConfiguration 读取：
+    #   time-zone / date-format 与 Spring Boot 官方同名同义；
+    #   datetime-format / time-format 为框架扩展键（官方无对应），默认值即下方所示
+    time-zone: GMT+8
+    datetime-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd
+    time-format: HH:mm:ss
+    # 框架扩展键：Long 序列化为字符串（防 JS 精度丢失），默认 false
+    long-to-string: false
+
+# spring-plus-framework 各模块配置（示例全量列出，按需取用）
+spring-plus:
+  web:
+    # 全局异常处理（详细项见 GlobalExceptionProperties）
+    error-response:
+      enabled: true
+    # 类级校验器 fail-fast（首个字段失败即抛）
+    validation:
+      fail-fast: true
+  client:
+    # HTTP 客户端：配置 base-url 后自动装配默认 ApiClient（示例不启用）
+    # base-url: https://example.api
+    ssl:
+      allow-insecure: false
+
+logging:
+  level:
+    io.github.oatelauser.springplus: debug
