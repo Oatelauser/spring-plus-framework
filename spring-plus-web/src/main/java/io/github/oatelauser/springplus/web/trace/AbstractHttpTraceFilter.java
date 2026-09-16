@@ -11,7 +11,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
@@ -48,6 +47,13 @@ public abstract class AbstractHttpTraceFilter extends OncePerRequestFilter {
     private Set<String> recordMethods = DEFAULT_RECORD_METHODS;
     private static final String OVERSIZED_PAYLOAD = "[payload too large]";
 
+    /**
+     * 请求/响应旁录的最大字节数（超限记录占位说明，不影响本体）
+     */
+    public void setMaxPayloadSize(int maxPayloadSize) {
+        this.maxPayloadSize = maxPayloadSize;
+    }
+
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -65,8 +71,8 @@ public abstract class AbstractHttpTraceFilter extends OncePerRequestFilter {
         }
 
         HttpServletResponse responseToUse = response;
-        if (!(response instanceof ContentCachingResponseWrapper)) {
-            responseToUse = new ContentCachingResponseWrapper(response);
+        if (!(response instanceof BoundedTeeResponseWrapper)) {
+            responseToUse = new BoundedTeeResponseWrapper(response, this.maxPayloadSize);
         }
 
         int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
@@ -78,11 +84,7 @@ public abstract class AbstractHttpTraceFilter extends OncePerRequestFilter {
             if (!asyncRequest && isCandidateStatus(status)) {
                 String reqPayload = extractRequestPayload(requestToUse);
                 String resPayload = extractResponsePayload(responseToUse);
-                // 确保响应体写回客户端
-                copyBodyToResponse(responseToUse);
                 recordBody(requestToUse, responseToUse, reqPayload, resPayload);
-            } else if (!asyncRequest) {
-                copyBodyToResponse(responseToUse);
             }
         }
     }
@@ -91,7 +93,12 @@ public abstract class AbstractHttpTraceFilter extends OncePerRequestFilter {
      * 判断当前请求是否需要记录 body
      */
     protected boolean shouldRecordBody(HttpServletRequest request) {
-        return this.recordMethods.contains(request.getMethod());
+        if (!this.recordMethods.contains(request.getMethod())) {
+            return false;
+        }
+        // multipart 上传体不旁录（V16：大文件/二进制不进缓存与日志）
+        String contentType = request.getContentType();
+        return contentType == null || !contentType.toLowerCase().startsWith("multipart/");
     }
 
     /**
@@ -107,30 +114,13 @@ public abstract class AbstractHttpTraceFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 提取响应体内容（不会调用 copyBodyToResponse，由调用方统一处理）
+     * 提取响应体旁录片段（有界旁录：超限/二进制由包装器返回占位说明；响应本体已直写客户端）
      */
     private String extractResponsePayload(HttpServletResponse response) {
-        ContentCachingResponseWrapper wrapper =
-                WebUtils.getNativeResponse(response, ContentCachingResponseWrapper.class);
-        if (wrapper == null) {
-            return "";
+        if (response instanceof BoundedTeeResponseWrapper tee) {
+            return tee.payload();
         }
-        return toPayloadString(wrapper.getContentAsByteArray(), StandardCharsets.UTF_8);
-    }
-
-    /**
-     * 将缓存的响应体写回客户端
-     */
-    private void copyBodyToResponse(HttpServletResponse response) {
-        ContentCachingResponseWrapper wrapper = WebUtils.getNativeResponse(
-                response, ContentCachingResponseWrapper.class);
-        if (wrapper != null) {
-            try {
-                wrapper.copyBodyToResponse();
-            } catch (IOException e) {
-                log.error("Failed to write response body back to client", e);
-            }
-        }
+        return "";
     }
 
     /**
