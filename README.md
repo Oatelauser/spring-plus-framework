@@ -72,7 +72,7 @@ public SimpleResponse<User> user(@RequestParam Long id) {
 // 分页：Page{ item, totalCount, pageNum, pageSize, totalPage }
 @GetMapping("/users")
 public PageResponse<User> users(UserPageRequest request) {
-    return PageResponse.ok(request, userService.page(request), total);
+    return PageResponse.ok(request, total, userService.page(request));
 }
 
 // 运行时断言：失败直接抛 ServiceException（替代 if + throw 样板）

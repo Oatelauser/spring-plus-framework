@@ -11,3 +11,12 @@ target/
 .settings/
 dependency-reduced-pom.xml
 flattened-pom.xml
+
+# 安全：密钥/凭据文件防误提交
+*.asc
+*.gpg
+*.pgp
+secring*
+.env
+.env.*
+!.github/**/*.yml

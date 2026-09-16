@@ -64,7 +64,7 @@ application.yml 中的敏感配置以 `ENC(密文)` 书写，`EncryptedPropertyE
 
 ## 优雅停机
 
-`WebServerPostProcessor` 在 Web 容器就绪前触发容器中所有 `StartupProcess`（接口在 spring-plus-web 的 `web.lifecycle` 包）；`SmartGracefulShutdownHandler` 在停机时逆序执行 `ShutdownHook`，先摘流量后关资源。
+`WebServerPostProcessor` 在 Web 容器就绪前触发容器中所有 `StartupProcess`（接口在本模块 `boot.lifecycle` 包）；`SmartGracefulShutdownHandler` 在停机时逆序执行 `ShutdownHook`，先摘流量后关资源。
 
 ## 已知注意事项
 

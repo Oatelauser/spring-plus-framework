@@ -30,10 +30,9 @@ Spring Web 层能力拓展。提供：统一响应、状态码、全局异常（
 - `PageResponse<T>` / `Page` / `BasePageRequest` / `FieldErrorInfo`
 - `ServerStatus`（接口）/ `ClientStatus` / `BusinessStatus` / `SystemStatus` / `CommonStatus` / `ServerStatusProvider`
 
-异常与断言（`web.error`）：
+异常（`web.error`）：
 
 - `ServiceException`（`.withStack()` / `.signal()` 链式开关）
-- `AssertUtils`（notNull / isTrue / state / hasText / notEmpty×3 / noNullElements）
 - `@JsonExceptionResponse` / `@SseExceptionResponse` / `@NdjsonExceptionResponse` / `@ExceptionResponse`
 - `ExceptionMapper`（SPI）/ `LogStackPolicy`
 - `SseConnection` / `SseConnectionFactory` / `SseExceptionEmitter`（`error.sse`）
@@ -42,13 +41,13 @@ Spring Web 层能力拓展。提供：统一响应、状态码、全局异常（
 
 - `HttpWriterFactory` + `ChunkStreamWriter` / `NdjsonStreamWriter` / `FileDownloadWriter`（`web.stream`）
 - `@Phone` / `@EnumValue` / `@ListValues` / `@NoNullElement` / `@UniqueElement`（`web.validation`）
-- `JsonUtils` / `ApplicationContextHolder` / `BeanUtils`（`web.utils`）
+- `AssertUtils`（notNull / isTrue / state / hasText / notEmpty×3 / noNullElements，失败抛 `ServiceException`）/ `JsonUtils` / `ApplicationContextHolder` / `BeanUtils`（`web.utils`）
 - `@RecordHttp` / `@EnableRecordHttp`（`web.trace`）
 
 ## 决策规则
 
 1. Controller 返回值一律 `SimpleResponse<T>` / `PageResponse<T>`；Void 用 `SimpleResponse<Void>`
-2. 分页入参继承 `BasePageRequest`，响应用 `PageResponse.ok(request, list, total)`
+2. 分页入参继承 `BasePageRequest`，响应用 `PageResponse.ok(request, total, list)`
 3. 需要声明"不成立即抛业务异常"的判断，用 `AssertUtils`，不写 if + throw
 4. 错误响应不要手工构造：抛类型化异常，让全局体系渲染（注解 P0 > handler 默认 > Mapper 链 > 兜底）
 5. JSON 一律走 `JsonUtils`（容器 JsonMapper 同源），禁止业务代码自建 mapper
@@ -58,7 +57,7 @@ Spring Web 层能力拓展。提供：统一响应、状态码、全局异常（
 ```java
 return SimpleResponse.ok(vo);
 return SimpleResponse.ok();
-return PageResponse.ok(request, records, total);
+return PageResponse.ok(request, total, records);
 return SimpleResponse.fail(BusinessStatus.DATA_NOT_EXIST, id);   // 占位符格式化
 ```
 

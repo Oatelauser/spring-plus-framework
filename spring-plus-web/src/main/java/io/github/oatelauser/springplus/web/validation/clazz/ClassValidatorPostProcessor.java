@@ -1,6 +1,5 @@
 package io.github.oatelauser.springplus.web.validation.clazz;
 
-import io.github.oatelauser.springplus.web.lifecycle.StartupProcess;
 import io.github.oatelauser.springplus.web.validation.clazz.ClassValidator.OrderPolicy;
 import jakarta.validation.Configuration;
 import jakarta.validation.Validator;
@@ -16,6 +15,7 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.validation.autoconfigure.ValidationConfigurationCustomizer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -37,7 +37,7 @@ import static org.hibernate.validator.BaseHibernateValidatorConfiguration.FAIL_F
  * @see ClassValidator#policy()
  * @since 1.0
  */
-public class ClassValidatorPostProcessor implements StartupProcess, ApplicationContextAware, ValidationConfigurationCustomizer {
+public class ClassValidatorPostProcessor implements SmartInitializingSingleton, ApplicationContextAware, ValidationConfigurationCustomizer {
 
     private ApplicationContext applicationContext;
 
@@ -72,7 +72,7 @@ public class ClassValidatorPostProcessor implements StartupProcess, ApplicationC
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void start() {
+    public void afterSingletonsInstantiated() {
         Validator validatorBean = applicationContext.getBean(Validator.class);
         if (!(validatorBean instanceof LocalValidatorFactoryBean validatorFactoryBean)) {
             return;

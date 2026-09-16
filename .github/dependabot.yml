@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # 安全补丁及时跟进（对应审计 SEC-001：Boot 安全补丁 30 天内跟进的要求）
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

@@ -1,5 +1,6 @@
-package io.github.oatelauser.springplus.web.error;
+package io.github.oatelauser.springplus.web.utils;
 
+import io.github.oatelauser.springplus.web.error.ServiceException;
 import io.github.oatelauser.springplus.web.response.BusinessStatus;
 import io.github.oatelauser.springplus.web.response.ServerStatus;
 import org.junit.jupiter.api.Test;

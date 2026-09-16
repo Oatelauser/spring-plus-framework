@@ -15,19 +15,18 @@ Spring Web 层能力拓展：不依赖 Spring Boot 也能使用的 Web 协议层
 | 校验注解 | `@Phone` / `@EnumValue` / `@ListValues` / `@NoNullElement` / `@UniqueElement` / `ClassValidator` |
 | 请求追踪 | `@RecordHttp` / `@EnableRecordHttp` / `LoggingHttpTraceFilter` |
 | 统一 JSON 门面 | `JsonUtils`（容器 `JsonMapper` 优先，非容器兜底自建） |
-| 启动过程 SPI | `StartupProcess`（`web.lifecycle` 包） |
+| ~~启动过程 SPI~~ | 已移至 spring-plus-boot（`boot.lifecycle` 包） |
 
 ## 包结构（名实对照）
 
 ```
 io.github.oatelauser.springplus.web
 ├── response/    响应与状态码（SimpleResponse / ServerStatus / Page / PageResponse / BasePageRequest / FieldErrorInfo）
-├── error/       异常体系（annotation / descriptor / engine / mapper / output / sse 子包 + ServiceException + AssertUtils）
+├── error/       异常体系（annotation / descriptor / engine / mapper / output / sse 子包 + ServiceException）
 ├── stream/      流式响应写入器（原 servlet 包，名实修正）
 ├── trace/       HTTP 请求追踪（原 process 包；@RecordHttp 注解同包）
 ├── validation/  校验注解（field / collection / clazz 三层）
-├── lifecycle/   StartupProcess 启动 SPI
-├── utils/       ApplicationContextHolder / JsonUtils / BeanUtils / FileResources 等
+├── utils/       ApplicationContextHolder / JsonUtils / BeanUtils / FileResources / AssertUtils（运行时断言） 等
 └── autoconfigure/ SpringPlusWebAutoConfiguration / ExceptionHandlingAutoConfiguration / GlobalExceptionProperties
 ```
 

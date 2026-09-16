@@ -1,5 +1,7 @@
 package io.github.oatelauser.springplus.web.response;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,7 @@ import java.util.List;
  * @date 2026-09-16
  * @since 1.0
  */
+@Data
 public class Page<T> {
 
     /**
@@ -22,7 +25,7 @@ public class Page<T> {
     /**
      * 总记录数
      */
-    private long totalCount;
+    private long total;
 
     /**
      * 当前页码
@@ -39,54 +42,14 @@ public class Page<T> {
      */
     private long totalPage;
 
-    public static <T> Page<T> of(long pageNum, long pageSize, List<T> item, long totalCount) {
+    public static <T> Page<T> of(long pageNum, long pageSize, long total, List<T> item) {
         Page<T> page = new Page<>();
         page.item = item;
-        page.totalCount = totalCount;
+        page.total = total;
         page.pageNum = pageNum;
         page.pageSize = pageSize;
-        page.totalPage = pageSize <= 0 ? 0 : (totalCount + pageSize - 1) / pageSize;
+        page.totalPage = pageSize <= 0 ? 0 : (total + pageSize - 1) / pageSize;
         return page;
-    }
-
-    public List<T> getItem() {
-        return item;
-    }
-
-    public void setItem(List<T> item) {
-        this.item = item;
-    }
-
-    public long getTotalCount() {
-        return totalCount;
-    }
-
-    public void setTotalCount(long totalCount) {
-        this.totalCount = totalCount;
-    }
-
-    public long getPageNum() {
-        return pageNum;
-    }
-
-    public void setPageNum(long pageNum) {
-        this.pageNum = pageNum;
-    }
-
-    public long getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(long pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public long getTotalPage() {
-        return totalPage;
-    }
-
-    public void setTotalPage(long totalPage) {
-        this.totalPage = totalPage;
     }
 
 }

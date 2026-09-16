@@ -1,1 +1,2 @@
-org.springframework.context.ApplicationContextInitializer=\nio.github.oatelauser.springplus.web.utils.ApplicationContextHolder
+org.springframework.context.ApplicationContextInitializer=\
+io.github.oatelauser.springplus.web.utils.ApplicationContextHolder

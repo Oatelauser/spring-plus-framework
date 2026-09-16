@@ -7,7 +7,7 @@ import io.github.oatelauser.springplus.boot.client.interceptor.AuthProvider;
 import io.github.oatelauser.springplus.boot.client.metrics.ApiClientMetricsPostProcessor;
 import io.github.oatelauser.springplus.boot.lifecycle.ShutdownHook;
 import io.github.oatelauser.springplus.boot.lifecycle.SmartGracefulShutdownHandler;
-import io.github.oatelauser.springplus.web.lifecycle.StartupProcess;
+import io.github.oatelauser.springplus.boot.lifecycle.StartupProcess;
 import io.github.oatelauser.springplus.boot.lifecycle.WebServerPostProcessor;
 import io.github.oatelauser.springplus.boot.redis.RedisStringOperation;
 import io.micrometer.core.instrument.MeterRegistry;

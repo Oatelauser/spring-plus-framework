@@ -18,7 +18,10 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HexFormat;
 
-/** 防重复提交拦截器。 */
+/**
+ * 防重复提交拦截器。
+ */
+@SuppressWarnings("SpellCheckingInspection")
 public class RepeatSubmitInterceptor implements MethodInterceptor {
 
     private final IdempotentStore store;

@@ -12,3 +12,11 @@
 - governor → web 单向依赖；AOP Advisor 装配从原 web 自动配置迁至 `SpringPlusGovernorAutoConfiguration`
 - 未来的限流/熔断能力直接落 governor，不再迁移既有代码
 - `StartupProcess` SPI 因被 web 的校验器与 boot 的生命周期共同实现，下沉到 `web.lifecycle` 包（依赖方向：boot → web）
+
+## 补记（2026-09-16，1.0.1 开发期）
+
+`StartupProcess` 移回 **`boot.lifecycle`**（维护者决策：生命周期域归 boot 模块）。
+循环依赖改为在 web 侧解耦：`ClassValidatorPostProcessor` 不再实现 `StartupProcess`，
+改挂 Spring 标准的 `SmartInitializingSingleton`（单例实例化完毕即回调，仍先于 Web 服务器接受请求），
+web→boot 依赖随之移除，boot → web 单向依赖关系不变。**对消费方为破坏性包变更**
+（实现 `StartupProcess` 的业务代码需改 import），记入 1.0.1 CHANGELOG。

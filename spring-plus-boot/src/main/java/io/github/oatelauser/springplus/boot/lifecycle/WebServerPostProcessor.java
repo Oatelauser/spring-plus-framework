@@ -5,7 +5,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.util.CollectionUtils;
 
-import io.github.oatelauser.springplus.web.lifecycle.StartupProcess;
+import io.github.oatelauser.springplus.boot.lifecycle.StartupProcess;
 
 import java.util.List;
 

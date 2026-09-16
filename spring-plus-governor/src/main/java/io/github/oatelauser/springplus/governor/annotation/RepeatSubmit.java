@@ -34,8 +34,8 @@ import java.util.concurrent.TimeUnit;
  * @since 1.1
  */
 @Documented
-@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface RepeatSubmit {
 
     /**
@@ -55,8 +55,9 @@ public @interface RepeatSubmit {
     /**
      * SpEL 表达式，从方法参数中动态提取用于生成 key 的字段。
      * <p>
-     * 对 {@link TokenKeyStrategy} 必填；对 {@link FingerprintKeyStrategy} 可选。
+     * 对 {@link io.github.oatelauser.springplus.governor.idempotent.TokenKeyStrategy} 必填；对 {@link FingerprintKeyStrategy} 可选。
      */
+    @SuppressWarnings("SpellCheckingInspection")
     String spel() default "";
 
 }

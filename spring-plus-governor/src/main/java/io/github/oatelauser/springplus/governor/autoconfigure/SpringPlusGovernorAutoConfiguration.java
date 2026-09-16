@@ -1,26 +1,18 @@
 package io.github.oatelauser.springplus.governor.autoconfigure;
 
-import io.github.oatelauser.springplus.governor.idempotent.FingerprintKeyStrategy;
-import io.github.oatelauser.springplus.governor.idempotent.IdempotentInterceptor;
-import io.github.oatelauser.springplus.governor.idempotent.IdempotentKeyStrategy;
-import io.github.oatelauser.springplus.governor.idempotent.IdempotentPointcuts;
-import io.github.oatelauser.springplus.governor.idempotent.IdempotentStore;
-import io.github.oatelauser.springplus.governor.idempotent.InMemoryIdempotentStore;
-import io.github.oatelauser.springplus.governor.idempotent.KeyStrategyResolver;
-import io.github.oatelauser.springplus.governor.idempotent.RedisIdempotentStore;
-import io.github.oatelauser.springplus.governor.idempotent.RepeatSubmitInterceptor;
+import io.github.oatelauser.springplus.governor.idempotent.*;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
  * spring-plus-governor 自动配置类
@@ -57,23 +49,15 @@ public class SpringPlusGovernorAutoConfiguration {
             // StringRedisTemplate 只在方法体内按类名探测，避免作为参数/返回类型出现在签名中，
             // 使无 Redis 依赖时本配置类仍可被安全反射（方法签名不会触发可选类型类加载）。
             // classpath 有该类但容器未装配（未引驱动/排除了 Redis 自动配置）时回落内存存储。
-            if (classExists("org.springframework.data.redis.core.StringRedisTemplate")) {
-                StringRedisTemplate template = beanFactory
-                        .getBeanProvider(StringRedisTemplate.class).getIfAvailable();
+            try {
+                Class.forName("org.springframework.data.redis.core.StringRedisTemplate");
+                StringRedisTemplate template = beanFactory.getBeanProvider(StringRedisTemplate.class).getIfAvailable();
                 if (template != null) {
                     return new RedisIdempotentStore(template);
                 }
+            } catch (ClassNotFoundException ignored) {
             }
             return new InMemoryIdempotentStore();
-        }
-
-        private static boolean classExists(String name) {
-            try {
-                Class.forName(name);
-                return true;
-            } catch (ClassNotFoundException ignored) {
-                return false;
-            }
         }
 
         @Bean

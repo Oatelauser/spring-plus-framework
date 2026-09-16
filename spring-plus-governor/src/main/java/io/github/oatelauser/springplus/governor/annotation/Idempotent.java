@@ -41,8 +41,8 @@ import java.util.concurrent.TimeUnit;
  * @since 1.1
  */
 @Documented
-@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Idempotent {
 
     /**

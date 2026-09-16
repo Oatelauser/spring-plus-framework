@@ -13,6 +13,7 @@ import org.aopalliance.intercept.MethodInvocation;
  * @date 2026-08-31
  * @since 1.2
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class TokenKeyStrategy implements IdempotentKeyStrategy {
 
     @Override

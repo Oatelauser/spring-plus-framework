@@ -8,7 +8,7 @@ import static io.github.oatelauser.springplus.web.response.CommonStatus.SUCCESS;
  * 分页响应
  *
  * <pre>{@code
- * PageResponse.ok(request, list, total)   // 全字段：页信息来自 BasePageRequest
+ * PageResponse.ok(request, total, list)   // 全字段：页信息来自 BasePageRequest
  * PageResponse.ok(list, total)            // 简写：pageNum/pageSize 置 0，由调用方上下文补
  * }</pre>
  *
@@ -21,28 +21,28 @@ public class PageResponse<T> extends SimpleResponse<Page<T>> {
     /**
      * 分页响应（页信息来自分页请求；请求字段为 null 时回落默认值 1/10）
      */
-    public static <T> PageResponse<T> ok(BasePageRequest request, List<T> item, long totalCount) {
+    public static <T> PageResponse<T> ok(BasePageRequest request, long total, List<T> item) {
         int pageNum = request.getPageNum() != null ? request.getPageNum() : 1;
         int pageSize = request.getPageSize() != null ? request.getPageSize() : 10;
-        return ok(pageNum, pageSize, item, totalCount);
+        return ok(pageNum, pageSize, total, item);
     }
 
     /**
      * 分页响应（全字段）
      */
-    public static <T> PageResponse<T> ok(long pageNum, long pageSize, List<T> item, long totalCount) {
+    public static <T> PageResponse<T> ok(long pageNum, long pageSize, long total, List<T> item) {
         PageResponse<T> response = new PageResponse<>();
         response.setCode(SUCCESS.code);
         response.setMessage(SUCCESS.message);
-        response.setData(Page.of(pageNum, pageSize, item, totalCount));
+        response.setData(Page.of(pageNum, pageSize, total, item));
         return response;
     }
 
     /**
      * 分页响应（简写：pageNum/pageSize 置 0）
      */
-    public static <T> PageResponse<T> ok(List<T> item, long totalCount) {
-        return ok(0, 0, item, totalCount);
+    public static <T> PageResponse<T> ok(List<T> item, long total) {
+        return ok(0, 0, total, item);
     }
 
 }
