@@ -101,7 +101,8 @@ mvn -P release deploy      # 发布到 Maven Central（需 central 账号与 GPG
 
 - Java 21 基线，Boot 4.1.0 BOM import（不继承 starter-parent）
 - 根 POM 已配置 central-publishing / source / javadoc / gpg 插件（`-P release` 激活）
-- examples 模块已设置 `maven.deploy.skip`，不参与发布
+- examples 模块已排除发布（`excludeArtifacts`）
+- **打 tag 自动发布**：推送 `v*` 标签触发 GitHub Actions 全自动构建/签名/上传 Central——完整流程（Secrets 配置、CI 脚本、发布 SOP、踩坑记录）见 [docs/release-with-github-actions.md](./docs/release-with-github-actions.md)
 
 ## License
 
