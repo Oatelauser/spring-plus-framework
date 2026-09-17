@@ -7,6 +7,7 @@
 ### 安全增强
 
 - **V16**：请求追踪响应侧改有界旁录（直写透传 + 超限占位 + 二进制/multipart 跳过），大响应误标 `@RecordHttp` 不再缓冲整包
+- **V15**：幂等注解 SpEL 求值收紧——SimpleEvaluationContext 只读数据绑定（`T()` 类型引用 / `new` 构造 / 方法调用一律拒绝）+ 表达式解析缓存
 - **V13**：Redis 批量通配护栏——pattern 必须含实质前缀（拒绝 `*` 全库匹配），`batchGet` 返回上限默认 1000 条超限 fail-fast
 - **V09/SEC-004**：ApiClient SSRF 防护——`spring-plus.client.ssrf.*`（enabled / allowed-hosts / deny-private-network，默认关闭保持兼容），请求发出前校验目标主机（绝对 URI 覆盖 baseUrl 的注入路径覆盖），解析失败 fail-closed；跨主机重定向自动剥离 Authorization/Cookie（`strip-credentials-on-cross-host-redirect` 默认开启，仅 HTTP_COMPONENTS 引擎）
 

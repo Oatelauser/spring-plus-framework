@@ -7,10 +7,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
@@ -50,24 +46,13 @@ public class RepeatSubmitInterceptor implements MethodInterceptor {
 
     private String resolveKey(String spel, Class<? extends IdempotentKeyStrategy> strategyClass, MethodInvocation invocation) {
         IdempotentKeyStrategy strategy = strategyResolver.resolve(strategyClass);
-        String spelValue = (spel == null || spel.isBlank()) ? null : evalSpelValue(spel, invocation);
+        String spelValue = (spel == null || spel.isBlank()) ? null
+                : IdempotentSpelEvaluator.evaluate(spel, invocation);
         String raw = strategy.extract(spel, spelValue, invocation);
         if (raw == null) {
             throw new ServiceException(BusinessStatus.REPEAT_SUBMIT);
         }
         return "idempotent:" + strategy.strategyName() + ":" + sha256(raw);
-    }
-
-    private static String evalSpelValue(String spel, MethodInvocation invocation) {
-        EvaluationContext context = new StandardEvaluationContext();
-        java.lang.reflect.Parameter[] parameters = invocation.getMethod().getParameters();
-        Object[] args = invocation.getArguments();
-        for (int i = 0; i < parameters.length; i++) {
-            context.setVariable(parameters[i].getName(), i < args.length ? args[i] : null);
-        }
-        Expression expression = new SpelExpressionParser().parseExpression(spel);
-        Object value = expression.getValue(context);
-        return value == null ? null : value.toString();
     }
 
     private static String sha256(String value) {
