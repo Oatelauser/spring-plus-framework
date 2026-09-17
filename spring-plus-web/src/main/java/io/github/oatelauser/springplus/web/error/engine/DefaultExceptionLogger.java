@@ -81,15 +81,15 @@ public class DefaultExceptionLogger implements ExceptionLogger {
         if (policy.level() == LogPolicyTable.LogLevel.ERROR) {
             // 异常对象作为最后一个参数传入 → SLF4J 打印完整堆栈（设计规约：堆栈保留）。
             if (printStack) {
-                LOG.error(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), descriptor.getMessage(), ex);
+                LOG.error(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), sanitize(descriptor), ex);
             } else {
-                LOG.error(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), descriptor.getMessage());
+                LOG.error(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), sanitize(descriptor));
             }
         } else {
             if (printStack) {
-                LOG.warn(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), descriptor.getMessage(), ex);
+                LOG.warn(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), sanitize(descriptor), ex);
             } else {
-                LOG.warn(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), descriptor.getMessage());
+                LOG.warn(PATTERN, requestInfo, handlerInfo, protocolTag, descriptor.getCode(), sanitize(descriptor));
             }
         }
     }
@@ -131,4 +131,11 @@ public class DefaultExceptionLogger implements ExceptionLogger {
         return handlerMethod == null ? "Handler: N/A"
                 : handlerMethod.getBeanType().getSimpleName() + "#" + handlerMethod.getMethod().getName();
     }
+    /**
+     * V21/CWE-117：日志消息单行化（CRLF 折叠防日志伪造）+ 截断。
+     */
+    private static String sanitize(io.github.oatelauser.springplus.web.error.descriptor.ErrorDescriptor descriptor) {
+        return io.github.oatelauser.springplus.web.utils.LogSanitizer.sanitizeLine(descriptor.getMessage());
+    }
+
 }

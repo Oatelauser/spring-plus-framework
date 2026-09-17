@@ -7,6 +7,7 @@
 ### 安全增强
 
 - **V16**：请求追踪响应侧改有界旁录（直写透传 + 超限占位 + 二进制/multipart 跳过），大响应误标 `@RecordHttp` 不再缓冲整包
+- **V10/V21**：日志脱敏——`LogSanitizer` 掩码 JSON/form 载荷中的敏感键值（password/token/phone 等，BODY 级客户端日志与请求追踪旁录均接入）；异常日志消息 CRLF 单行化 + 512 字符截断（防日志伪造）
 - **V19**：`@RepeatSubmit` 新增 `releaseOnFailure`（默认 true 兼容）——防刷场景设 false 后业务异常不释放防重 key
 - **V24**：ClassValidatorPostProcessor 启动期断言 hibernate-validator 大版本（当前 9.x，漂移即失败）+ 两个静默分支补 warn 日志
 - **V22**：内存 SQL 白名单追加 XML 函数黑名单（EXISTS_NODE/EXTRACT_XML/XML_TRANSFORM/EXTRACT_VALUE）

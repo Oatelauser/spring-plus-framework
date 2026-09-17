@@ -68,14 +68,15 @@ public class LoggingHttpTraceFilter extends AbstractHttpTraceFilter implements H
     @Override
     protected void recordBody(HttpServletRequest request, HttpServletResponse response,
             String requestPayload, String responsePayload) {
+        // V10/CWE-532：旁录 payload 掩敏（password/token/phone 等）
         log.debug(REQUEST_LOG_TEMPLATE,
                 request.getMethod(), request.getRequestURI(),
                 response.getStatus(),
                 request.getQueryString(),
                 request.getContentType(),
                 request.getRemoteAddr(),
-                requestPayload,
-                responsePayload);
+                io.github.oatelauser.springplus.web.utils.LogSanitizer.maskSensitiveValues(requestPayload),
+                io.github.oatelauser.springplus.web.utils.LogSanitizer.maskSensitiveValues(responsePayload));
     }
 
     @Override

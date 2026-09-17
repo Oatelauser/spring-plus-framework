@@ -249,7 +249,9 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
 
         Charset charset = extractCharset(contentType);
         String bodyStr = new String(body, charset);
-        String truncated = truncate(bodyStr);
+        // V10/CWE-532：BODY 级日志对敏感键值掩码（password/token/phone 等）
+        String masked = io.github.oatelauser.springplus.web.utils.LogSanitizer.maskSensitiveValues(bodyStr);
+        String truncated = truncate(masked);
 
         log.debug("{}: {}", label, truncated);
     }

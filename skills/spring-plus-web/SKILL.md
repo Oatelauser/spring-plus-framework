@@ -88,6 +88,8 @@ return SimpleResponse.fail(BusinessStatus.DATA_NOT_EXIST, id);   // 占位符格
 
 ## 已知注意事项
 
+- BODY 级日志与请求追踪旁录已自动掩码敏感键（LogSanitizer 默认键集），但非默认命中的敏感字段（自定义业务键）仍会落日志——新增敏感字段时评估扩展键集
+
 - 成功码唯一（`00000`），`getSuccess()` 不存在"CREATED 二档"歧义——这是与双成功码体系的有意差异
 - `spring.jackson.datetime-format` / `time-format` / `long-to-string` 是框架扩展键，Boot 官方文档查不到
 - `ClassValidatorPostProcessor` 反射 hibernate-validator 内部 API，HV 版本锁定 9.1.0.Final
