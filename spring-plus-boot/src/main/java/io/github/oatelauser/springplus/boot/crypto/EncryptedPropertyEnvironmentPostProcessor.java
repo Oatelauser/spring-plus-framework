@@ -55,7 +55,14 @@ public class EncryptedPropertyEnvironmentPostProcessor implements EnvironmentPos
         encryptedEntries.forEach((name, encryptedValue) ->
                 decrypted.put(name, decryptEntry(name, encryptedValue, base64Key)));
         environment.getPropertySources()
-                .addFirst(new MapPropertySource(DECRYPTED_PROPERTY_SOURCE_NAME, decrypted));
+                .addFirst(new MapPropertySource(DECRYPTED_PROPERTY_SOURCE_NAME, decrypted) {
+                    /** toString 脱敏（V11/CWE-214）：/actuator/env 等呈现处只暴露键名与数量，不泄露明文值 */
+                    @Override
+                    public String toString() {
+                        return "MapPropertySource [name='" + getName() + "', keys="
+                                + source.keySet() + "](values masked)";
+                    }
+                });
     }
 
     /**

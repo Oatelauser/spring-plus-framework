@@ -39,7 +39,9 @@ public class RepeatSubmitInterceptor implements MethodInterceptor {
         try {
             return invocation.proceed();
         } catch (Throwable throwable) {
-            store.delete(key);
+            if (annotation.releaseOnFailure()) {
+                store.delete(key);
+            }
             throw throwable;
         }
     }

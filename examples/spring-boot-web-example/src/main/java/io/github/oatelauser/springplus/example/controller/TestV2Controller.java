@@ -38,7 +38,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -174,7 +173,7 @@ public class TestV2Controller {
     @Operation(summary = "UC-2：SSE 握手期 @Valid 失败")
     public SseEmitter sseValidateHandshake(@Valid @RequestBody EchoCmd cmd, HttpServletRequest request) {
         // 校验通过的话也返回 SSE，但本测试主要看异常路径。
-        SseConnection conn = sseConnectionFactory.open(request, Executors.newVirtualThreadPerTaskExecutor());
+        SseConnection conn = sseConnectionFactory.open(request, demoExecutor);
         conn.execute(emitter -> {
             emitter.send(SseEmitter.event().name("ok").data(cmd));
             emitter.complete();
@@ -212,12 +211,12 @@ public class TestV2Controller {
 
     /**
      * Controller 完全不写 {@code @ExceptionResponse}，验证「异常类上的注解」自动命中。
-     * 期望响应：{@code {"code":"B0204","message":"用户名已存在: alice", ...}}。
+     * 期望响应：{@code {"code":"B0204","message":"用户名已存在", ...}}。
      */
     @GetMapping("/exception-class-annotation")
     @Operation(summary = "UC-3：异常类上贴注解 + 占位符 {exception}")
     public SimpleResponse<Void> testExceptionClassAnnotation() {
-        throw new UsernameDuplicatedException("alice");
+        throw new UsernameDuplicatedException();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -260,7 +259,7 @@ public class TestV2Controller {
     @GetMapping(value = "/sse/c-tier", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "SSE C 档：连接封装零样板")
     public SseEmitter sseCTier(HttpServletRequest request) {
-        SseConnection conn = sseConnectionFactory.open(request, Executors.newVirtualThreadPerTaskExecutor());
+        SseConnection conn = sseConnectionFactory.open(request, demoExecutor);
         conn.execute(emitter -> {
             emitter.send(SseEmitter.event().name("tick").data("frame#1"));
             TimeUnit.MILLISECONDS.sleep(50);

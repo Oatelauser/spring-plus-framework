@@ -30,4 +30,5 @@ spring-plus:
 
 logging:
   level:
-    io.github.oatelauser.springplus: debug
+    # 生产勿开 debug：请求追踪会旁录请求/响应体（V10/V18）
+    io.github.oatelauser.springplus: info

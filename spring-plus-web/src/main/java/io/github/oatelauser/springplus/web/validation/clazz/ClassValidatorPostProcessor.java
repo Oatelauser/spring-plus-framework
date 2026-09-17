@@ -73,21 +73,29 @@ public class ClassValidatorPostProcessor implements SmartInitializingSingleton, 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void afterSingletonsInstantiated() {
+        assertHibernateValidatorMajorVersion();
         Validator validatorBean = applicationContext.getBean(Validator.class);
         if (!(validatorBean instanceof LocalValidatorFactoryBean validatorFactoryBean)) {
+            org.slf4j.LoggerFactory.getLogger(getClass()).warn(
+                    "Validator 不是 LocalValidatorFactoryBean（实际 {}），类级校验器排序拓展不生效",
+                    validatorBean.getClass().getName());
             return;
         }
 
         // 代理BeanMetaDataManager
         ValidatorFactory validatorFactory = validatorFactoryBean.unwrap(ValidatorFactory.class);
-        if (validatorFactory instanceof ValidatorFactoryImpl validatorFactoryImpl) {
-            ReflectionUtils.doWithFields(validatorFactoryImpl.getClass(), field -> {
-                ReflectionUtils.makeAccessible(field);
-                ConcurrentMap beanMetaDataManagers = (ConcurrentMap) ReflectionUtils.getField(field, validatorFactoryImpl);
-                assert beanMetaDataManagers != null;
-                beanMetaDataManagers.replaceAll((k, v) -> new OrderedBeanMetaDataManager((BeanMetaDataManager) v));
-            }, field -> "beanMetaDataManagers".equals(field.getName()));
+        if (!(validatorFactory instanceof ValidatorFactoryImpl validatorFactoryImpl)) {
+            org.slf4j.LoggerFactory.getLogger(getClass()).warn(
+                    "ValidatorFactory 不是 Hibernate Validator 实现（实际 {}），类级校验器排序拓展不生效",
+                    validatorFactory.getClass().getName());
+            return;
         }
+        ReflectionUtils.doWithFields(validatorFactoryImpl.getClass(), field -> {
+            ReflectionUtils.makeAccessible(field);
+            ConcurrentMap beanMetaDataManagers = (ConcurrentMap) ReflectionUtils.getField(field, validatorFactoryImpl);
+            assert beanMetaDataManagers != null;
+            beanMetaDataManagers.replaceAll((k, v) -> new OrderedBeanMetaDataManager((BeanMetaDataManager) v));
+        }, field -> "beanMetaDataManagers".equals(field.getName()));
         // 重新创建新的Validator，使用代理后的BeanMetaDataManager
         Validator repliceValidator = validatorFactory.getValidator();
         ReflectionUtils.doWithMethods(validatorFactoryBean.getClass(), method -> {
@@ -296,6 +304,26 @@ public class ClassValidatorPostProcessor implements SmartInitializingSingleton, 
      * 可排序的约束
      */
     record SortableConstraint(MetaConstraint<?> constraint, SortKey sortKey) {
+    }
+
+    /**
+     * 启动期 HV 大版本断言（V24）：本拓展反射 hibernate-validator 内部 API
+     * （beanMetaDataManagers / setTargetValidator），大版本漂移即破坏性变更——
+     * 与其运行期出现诡异校验行为，不如启动期明确失败。预期大版本：9。
+     */
+    static void assertHibernateValidatorMajorVersion() {
+        Package hvPackage = ValidatorFactoryImpl.class.getPackage();
+        String version = hvPackage != null ? hvPackage.getImplementationVersion() : null;
+        if (version == null) {
+            org.slf4j.LoggerFactory.getLogger(ClassValidatorPostProcessor.class).warn(
+                    "无法读取 hibernate-validator 实现版本（非标准打包？），跳过大版本断言");
+            return;
+        }
+        String major = version.split("\\.")[0];
+        if (!"9".equals(major)) {
+            throw new IllegalStateException("hibernate-validator 大版本漂移：当前 " + version
+                    + "，本拓展已验证的大版本为 9.x（反射内部 API）。请回归 validation 域测试后更新此断言");
+        }
     }
 
 }

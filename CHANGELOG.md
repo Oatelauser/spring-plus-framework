@@ -7,6 +7,12 @@
 ### 安全增强
 
 - **V16**：请求追踪响应侧改有界旁录（直写透传 + 超限占位 + 二进制/multipart 跳过），大响应误标 `@RecordHttp` 不再缓冲整包
+- **V19**：`@RepeatSubmit` 新增 `releaseOnFailure`（默认 true 兼容）——防刷场景设 false 后业务异常不释放防重 key
+- **V24**：ClassValidatorPostProcessor 启动期断言 hibernate-validator 大版本（当前 9.x，漂移即失败）+ 两个静默分支补 warn 日志
+- **V22**：内存 SQL 白名单追加 XML 函数黑名单（EXISTS_NODE/EXTRACT_XML/XML_TRANSFORM/EXTRACT_VALUE）
+- **V11**：ENC 解密属性源的 `toString` 脱敏（actuator/env 呈现只暴露键名不泄露明文）
+- **V12**：`InsecureTlsHelper` 标记 `@Deprecated`（仅测试联调，生产使用视同漏洞；业务代码禁止直接引用）
+- **V18**：示例净化——异常消息不再携带用户名原值（遵守自家脱敏规范）、SSE 演示复用共享线程池（修每请求新建不关闭的泄漏）、示例日志级别 debug→info
 - **V15**：幂等注解 SpEL 求值收紧——SimpleEvaluationContext 只读数据绑定（`T()` 类型引用 / `new` 构造 / 方法调用一律拒绝）+ 表达式解析缓存
 - **V13**：Redis 批量通配护栏——pattern 必须含实质前缀（拒绝 `*` 全库匹配），`batchGet` 返回上限默认 1000 条超限 fail-fast
 - **V09/SEC-004**：ApiClient SSRF 防护——`spring-plus.client.ssrf.*`（enabled / allowed-hosts / deny-private-network，默认关闭保持兼容），请求发出前校验目标主机（绝对 URI 覆盖 baseUrl 的注入路径覆盖），解析失败 fail-closed；跨主机重定向自动剥离 Authorization/Cookie（`strip-credentials-on-cross-host-redirect` 默认开启，仅 HTTP_COMPONENTS 引擎）

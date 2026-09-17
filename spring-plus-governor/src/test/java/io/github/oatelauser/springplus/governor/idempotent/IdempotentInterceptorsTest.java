@@ -97,6 +97,29 @@ class IdempotentInterceptorsTest {
                 StubInvocations.of(target, method, "ok", "order-6")));
     }
 
+    @org.junit.jupiter.api.Test
+    void repeatSubmitFailureKeepsKeyWhenReleaseOnFailureDisabled() throws Throwable {
+        // releaseOnFailure=false：业务异常后窗口期内仍拒绝（防故意触发异常绕过防重，V19）
+        RepeatSubmitInterceptor interceptor = new RepeatSubmitInterceptor(store, resolver);
+        Method keep = KeepSample.class.getDeclaredMethod("pay", String.class);
+        Object target = new KeepSample();
+
+        assertThrows(IllegalStateException.class, () -> interceptor.invoke(
+                StubInvocations.failing(target, keep, new IllegalStateException("boom"), "k1")));
+
+        ServiceException stillRejected = assertThrows(ServiceException.class, () -> interceptor.invoke(
+                StubInvocations.of(target, keep, "ok", "k1")));
+        assertEquals(BusinessStatus.REPEAT_SUBMIT.getCode(), stillRejected.getCode());
+    }
+
+    static class KeepSample {
+
+        @RepeatSubmit(releaseOnFailure = false)
+        public String pay(String orderId) {
+            return orderId;
+        }
+    }
+
     static class Sample {
 
         @RepeatSubmit

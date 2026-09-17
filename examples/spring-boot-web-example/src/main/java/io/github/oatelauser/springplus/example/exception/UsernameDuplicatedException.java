@@ -14,7 +14,7 @@ import java.io.Serial;
  * <h3>预期响应</h3>
  * <pre>
  *   HTTP 200 + JSON
- *   {"code":"B0204","data":null,"details":{},"message":"用户名已存在: alice","success":false}
+ *   {"code":"B0204","data":null,"details":{},"message":"用户名已存在","success":false}
  * </pre>
  * 日志层应得到 WARN 级别（业务异常体系，{@code ExceptionLogPolicyTable} 默认 WARN，不打堆栈）。
  *
@@ -22,14 +22,17 @@ import java.io.Serial;
  * @date 2026-06-15
  * @since 2.0
  */
-@ExceptionResponse(code = "B0204", msg = "用户名已存在: {exception}")
+@ExceptionResponse(code = "B0204", msg = "用户名已存在")
 public class UsernameDuplicatedException extends RuntimeException {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public UsernameDuplicatedException(String username) {
-        // exception.getLocalizedMessage() = username，被 {exception} 占位符替换进 msg。
-        super(username);
+    /**
+     * 消息不携带用户名原值（脱敏红线：错误消息不含请求值——V18 示例净化）。
+     * {exception} 占位符的演示见 {@code /v2-test/placeholder} 端点（消息模板来自注解属性）。
+     */
+    public UsernameDuplicatedException() {
+        super("用户名已存在");
     }
 }

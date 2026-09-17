@@ -43,6 +43,12 @@ public @interface RepeatSubmit {
      */
     long window() default 5;
 
+    /**
+     * 业务方法抛出异常时是否释放防重 key：true（默认）——失败后允许立即重试；
+     * false——窗口期内失败也拒绝重试（防刷场景：攻击者故意触发异常绕过防重刷接口）。
+     */
+    boolean releaseOnFailure() default true;
+
     TimeUnit unit() default TimeUnit.SECONDS;
 
     /**

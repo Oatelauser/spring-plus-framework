@@ -80,6 +80,10 @@ public final class SqlAstWhitelist {
         }
     }
 
+    /** XML/文件系函数黑名单（V22 纵深）：XXE 已由 Calcite≥1.32 默认禁 DTD/外部实体修复，此处防函数面绕过 */
+    private static final java.util.Set<String> BLOCKED_FUNCTIONS = java.util.Set.of(
+            "EXISTS_NODE", "EXTRACT_XML", "XML_TRANSFORM", "EXTRACT_VALUE");
+
     private static void walk(SqlNode node) {
         if (node == null) {
             return;
@@ -87,6 +91,12 @@ public final class SqlAstWhitelist {
         SqlKind kind = node.getKind();
         if (BLOCKED.contains(kind)) {
             throw new SqlException("RESTRICTED 模式禁止 " + kind + " 语句");
+        }
+        if (node instanceof org.apache.calcite.sql.SqlBasicCall call && call.getOperator() != null) {
+            String function = call.getOperator().getName().toUpperCase(java.util.Locale.ROOT);
+            if (BLOCKED_FUNCTIONS.contains(function)) {
+                throw new SqlException("RESTRICTED 模式禁止函数: " + function);
+            }
         }
         if (node instanceof SqlSelect select) {
             walk(select.getSelectList());
