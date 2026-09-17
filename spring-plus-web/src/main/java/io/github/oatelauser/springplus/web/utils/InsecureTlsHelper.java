@@ -7,17 +7,11 @@ import java.security.cert.X509Certificate;
 
 /**
  * TLS工具类
- *
- * @author <a href="mailto:yangsheng1993812@gmail.com">Oatelauser</a>
- * @date 2026-03-03
- * @since 1.0
- */
-/**
- * @deprecated 仅限测试/内网联调使用，生产使用视同中间人漏洞（CWE-295）。
+ * <p>
+ * 仅限测试/内网联调使用，生产使用视同中间人漏洞（CWE-295）。
  * 业务代码禁止直接引用本类；ApiClient 路径的 trust-all 走
  * {@code spring-plus.client.ssl.verify=false + allow-insecure=true} 双开关确认门槛。
  */
-@Deprecated
 public final class InsecureTlsHelper {
 
     private InsecureTlsHelper() {}

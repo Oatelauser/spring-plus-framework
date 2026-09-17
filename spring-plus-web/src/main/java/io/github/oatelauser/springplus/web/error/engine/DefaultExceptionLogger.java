@@ -5,6 +5,7 @@ import io.github.oatelauser.springplus.web.error.ServiceException;
 import io.github.oatelauser.springplus.web.error.descriptor.ErrorDescriptor;
 import io.github.oatelauser.springplus.web.error.descriptor.LogStackPolicy;
 import io.github.oatelauser.springplus.web.error.descriptor.OutputProtocol;
+import io.github.oatelauser.springplus.web.utils.LogSanitizer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -128,14 +129,14 @@ public class DefaultExceptionLogger implements ExceptionLogger {
     }
 
     private static String formatHandler(@Nullable HandlerMethod handlerMethod) {
-        return handlerMethod == null ? "Handler: N/A"
-                : handlerMethod.getBeanType().getSimpleName() + "#" + handlerMethod.getMethod().getName();
+        return handlerMethod == null ? "Handler: N/A" : handlerMethod.getBeanType().getSimpleName()
+                + "#" + handlerMethod.getMethod().getName();
     }
     /**
      * V21/CWE-117：日志消息单行化（CRLF 折叠防日志伪造）+ 截断。
      */
-    private static String sanitize(io.github.oatelauser.springplus.web.error.descriptor.ErrorDescriptor descriptor) {
-        return io.github.oatelauser.springplus.web.utils.LogSanitizer.sanitizeLine(descriptor.getMessage());
+    private static String sanitize(ErrorDescriptor descriptor) {
+        return LogSanitizer.sanitizeLine(descriptor.getMessage());
     }
 
 }

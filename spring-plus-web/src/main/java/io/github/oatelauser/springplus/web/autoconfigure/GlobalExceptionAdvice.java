@@ -238,8 +238,7 @@ public class GlobalExceptionAdvice {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public Object handleNoResourceFoundException(NoResourceFoundException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleNoResourceFoundException(NoResourceFoundException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(ClientStatus.NOT_FOUND, ex)
                 .message("资源不存在: " + ex.getResourcePath()).build();
         return this.engine.dispatch(ex, descriptor, request, response);
@@ -248,8 +247,7 @@ public class GlobalExceptionAdvice {
     // ====================== 文件上传异常 ======================
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public Object handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpServletRequest request, HttpServletResponse response) {
         long maxSize = ex.getMaxUploadSize();
         String message = maxSize > 0
                 ? String.format("上传文件大小超出限制，最大允许: %dMB", maxSize / 1024 / 1024)
@@ -262,15 +260,13 @@ public class GlobalExceptionAdvice {
     // ====================== 超时异常 ======================
 
     @ExceptionHandler(AsyncRequestTimeoutException.class)
-    public Object handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(ClientStatus.REQUEST_TIMEOUT, ex).build();
         return this.engine.dispatch(ex, descriptor, request, response);
     }
 
     @ExceptionHandler(TimeoutException.class)
-    public Object handleTimeoutException(TimeoutException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleTimeoutException(TimeoutException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(SystemStatus.SERVICE_TIMEOUT, ex).build();
         return this.engine.dispatch(ex, descriptor, request, response);
     }
@@ -278,16 +274,14 @@ public class GlobalExceptionAdvice {
     // ====================== 数据库异常 ======================
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public Object handleDuplicateKeyException(DuplicateKeyException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleDuplicateKeyException(DuplicateKeyException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(BusinessStatus.DATA_DUPLICATE, ex)
                 .message("数据已存在，请勿重复添加").build();
         return this.engine.dispatch(ex, descriptor, request, response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public Object handleDataIntegrityViolationException(DataIntegrityViolationException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest request, HttpServletResponse response) {
         BusinessStatus status = ex.getCause() instanceof DuplicateKeyException
                 ? BusinessStatus.DATA_DUPLICATE
                 : BusinessStatus.DATA_REFERENCED;
@@ -297,15 +291,13 @@ public class GlobalExceptionAdvice {
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public Object handleDataAccessException(DataAccessException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleDataAccessException(DataAccessException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(SystemStatus.DATABASE_ERROR, ex).build();
         return this.engine.dispatch(ex, descriptor, request, response);
     }
 
     @ExceptionHandler(SQLException.class)
-    public Object handleSQLException(SQLException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleSQLException(SQLException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(SystemStatus.DATABASE_ERROR, ex).build();
         return this.engine.dispatch(ex, descriptor, request, response);
     }
@@ -321,8 +313,7 @@ public class GlobalExceptionAdvice {
      * 则注解覆盖本默认描述。
      */
     @ExceptionHandler(ServiceException.class)
-    public Object handleServiceException(ServiceException ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleServiceException(ServiceException ex, HttpServletRequest request, HttpServletResponse response) {
         ErrorDescriptor descriptor = ErrorDescriptor.of(ex.getCode(), ex.getMessage(), ex)
                 .statusIntent(ex.getResponseStatus()).build();
         return this.engine.dispatch(ex, descriptor, request, response);
@@ -351,8 +342,7 @@ public class GlobalExceptionAdvice {
      * {@code ExceptionTranslationFilter} / 方法级 denied handler 翻译为 403。
      */
     @ExceptionHandler(Exception.class)
-    public Object handleException(Exception ex,
-            HttpServletRequest request, HttpServletResponse response) {
+    public Object handleException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
         for (Class<?> type = ex.getClass(); type != null; type = type.getSuperclass()) {
             for (String denied : SECURITY_DENIED_CLASSES) {
                 if (denied.equals(type.getName())) {

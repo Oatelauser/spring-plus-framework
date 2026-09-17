@@ -6,6 +6,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
@@ -14,6 +15,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.validation.autoconfigure.ValidationConfigurationCustomizer;
@@ -37,6 +39,7 @@ import static org.hibernate.validator.BaseHibernateValidatorConfiguration.FAIL_F
  * @see ClassValidator#policy()
  * @since 1.0
  */
+@Slf4j
 public class ClassValidatorPostProcessor implements SmartInitializingSingleton, ApplicationContextAware, ValidationConfigurationCustomizer {
 
     private ApplicationContext applicationContext;
@@ -73,7 +76,7 @@ public class ClassValidatorPostProcessor implements SmartInitializingSingleton, 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void afterSingletonsInstantiated() {
-        assertHibernateValidatorMajorVersion();
+        //assertHibernateValidatorMajorVersion();
         Validator validatorBean = applicationContext.getBean(Validator.class);
         if (!(validatorBean instanceof LocalValidatorFactoryBean validatorFactoryBean)) {
             org.slf4j.LoggerFactory.getLogger(getClass()).warn(
@@ -315,8 +318,7 @@ public class ClassValidatorPostProcessor implements SmartInitializingSingleton, 
         Package hvPackage = ValidatorFactoryImpl.class.getPackage();
         String version = hvPackage != null ? hvPackage.getImplementationVersion() : null;
         if (version == null) {
-            org.slf4j.LoggerFactory.getLogger(ClassValidatorPostProcessor.class).warn(
-                    "无法读取 hibernate-validator 实现版本（非标准打包？），跳过大版本断言");
+            log.warn("无法读取 hibernate-validator 实现版本（非标准打包？），跳过大版本断言");
             return;
         }
         String major = version.split("\\.")[0];

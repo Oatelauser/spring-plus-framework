@@ -1,5 +1,7 @@
 package io.github.oatelauser.springplus.boot.redis;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisCallback;
@@ -29,6 +31,15 @@ public class RedisStringOperation {
     @SuppressWarnings("all")
     private final RedisScript<Long> batchDeleteScript = RedisScript.of(new ClassPathResource("lua/bdel.lua"), Long.class);
     private final RedisScript<Long> incrementScript = RedisScript.of(new ClassPathResource("lua/expire_increment.lua"), Long.class);
+
+    /**
+     * batchGet 单次返回上限（防全库匹配值一次性进堆内存），默认 1000；超限抛出，提示收紧 pattern。
+     */
+    public static final int DEFAULT_MAX_BATCH_GET_RESULTS = 1000;
+
+    @Setter
+    @Getter
+    private int maxBatchGetResults = DEFAULT_MAX_BATCH_GET_RESULTS;
 
     public RedisStringOperation(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -202,36 +213,25 @@ public class RedisStringOperation {
     // ========================= 批量通配护栏（V13 / CWE-400） =========================
 
     /**
-     * batchGet 单次返回上限（防全库匹配值一次性进堆内存），默认 1000；超限抛出，提示收紧 pattern。
-     */
-    public static final int DEFAULT_MAX_BATCH_GET_RESULTS = 1000;
-
-    private int maxBatchGetResults = DEFAULT_MAX_BATCH_GET_RESULTS;
-
-    public void setMaxBatchGetResults(int maxBatchGetResults) {
-        this.maxBatchGetResults = maxBatchGetResults;
-    }
-
-    /**
      * 校验 pattern 具备实质作用域：首个 {@code *} 之前必须存在至少一个字母数字字符。
      * 纯通配（{@code *}/{@code *:*}）会演变为全库 SCAN / 全库删除，直接拒绝。
      */
     static void requireScopedPattern(String pattern) {
-        String prefix = pattern.contains("*")
-                ? pattern.substring(0, pattern.indexOf('*'))
-                : pattern;
-        boolean scoped = prefix.chars().anyMatch(c -> Character.isLetterOrDigit(c));
+        String prefix = pattern.contains("*") ? pattern.substring(0, pattern.indexOf('*')) : pattern;
+        boolean scoped = prefix.chars().anyMatch(Character::isLetterOrDigit);
         if (!scoped) {
             throw new IllegalArgumentException("批量操作 pattern 必须包含实质前缀（拒绝全库匹配）: "
                     + pattern + "，例如 user:* 而非 *");
         }
     }
 
-    /** 校验 batchGet 结果条数在上限内（超限 fail-fast，避免调用方无意间全量拉取） */
+    /**
+     * 校验 batchGet 结果条数在上限内（超限 fail-fast，避免调用方无意间全量拉取）
+     */
     void requireWithinLimit(int size) {
         if (size > maxBatchGetResults) {
-            throw new IllegalStateException("batchGet 匹配 " + size
-                    + " 条超过上限 " + maxBatchGetResults + "（防全量拉取打爆堆内存），请收紧 pattern");
+            throw new IllegalStateException("batchGet 匹配 " + size + " 条超过上限 "
+                    + maxBatchGetResults + "（防全量拉取打爆堆内存），请收紧 pattern");
         }
     }
 

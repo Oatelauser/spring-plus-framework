@@ -1,7 +1,7 @@
 package io.github.oatelauser.springplus.boot.crypto;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.EnvironmentPostProcessor;
+import org.springframework.boot.SpringApplication;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -56,7 +56,9 @@ public class EncryptedPropertyEnvironmentPostProcessor implements EnvironmentPos
                 decrypted.put(name, decryptEntry(name, encryptedValue, base64Key)));
         environment.getPropertySources()
                 .addFirst(new MapPropertySource(DECRYPTED_PROPERTY_SOURCE_NAME, decrypted) {
-                    /** toString 脱敏（V11/CWE-214）：/actuator/env 等呈现处只暴露键名与数量，不泄露明文值 */
+                    /**
+                     * toString 脱敏（V11/CWE-214）：/actuator/env 等呈现处只暴露键名与数量，不泄露明文值
+                     */
                     @Override
                     public String toString() {
                         return "MapPropertySource [name='" + getName() + "', keys="

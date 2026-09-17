@@ -2,11 +2,13 @@ package io.github.oatelauser.springplus.security.authorization;
 
 import lombok.Getter;
 import org.aopalliance.intercept.MethodInvocation;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.ComposablePointcut;
 import org.springframework.aop.support.Pointcuts;
+import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -35,6 +37,17 @@ import static io.github.oatelauser.springplus.security.authorization.AnnotationA
 @Getter
 @SuppressWarnings("ClassCanBeRecord")
 public class CompositeAuthorizationManager implements AuthorizationManager<MethodInvocation> {
+
+
+    /**
+     * 永不匹配切点：空授权器集合时拦截器空转（如无后置语义授权器时注册后置拦截器，合法状态）
+     */
+    private static final Pointcut NEVER_MATCH = new StaticMethodMatcherPointcut() {
+        @Override
+        public boolean matches(@NonNull Method method, @NonNull Class<?> targetClass) {
+            return false;
+        }
+    };
 
     private final List<AnnotationAuthorizer> authorizationManagers;
 
@@ -86,14 +99,6 @@ public class CompositeAuthorizationManager implements AuthorizationManager<Metho
 
         return forAnnotations(annotationSet);
     }
-
-    /** 永不匹配切点：空授权器集合时拦截器空转（如无后置语义授权器时注册后置拦截器，合法状态） */
-    private static final Pointcut NEVER_MATCH = new org.springframework.aop.support.StaticMethodMatcherPointcut() {
-        @Override
-        public boolean matches(java.lang.reflect.Method method, Class<?> targetClass) {
-            return false;
-        }
-    };
 
     static Pointcut forAnnotations(Collection<Class<? extends Annotation>> annotations) {
         if (annotations.isEmpty()) {

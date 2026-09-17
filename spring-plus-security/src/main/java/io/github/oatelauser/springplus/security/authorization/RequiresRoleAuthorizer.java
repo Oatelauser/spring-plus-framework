@@ -3,8 +3,12 @@ package io.github.oatelauser.springplus.security.authorization;
 import io.github.oatelauser.springplus.security.annotation.RequiresAdminRole;
 import io.github.oatelauser.springplus.security.annotation.RequiresRole;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -14,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMergedMethodAnnotation;
+import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 
 /**
@@ -26,12 +31,19 @@ import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMerg
  * @since 1.0
  */
 @SuppressWarnings("unchecked")
-public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer {
+public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer implements ApplicationListener<ApplicationReadyEvent> {
 
     private final GrantedAuthorityDefaults authorityDefaults;
 
     public RequiresRoleAuthorizer(ObjectProvider<GrantedAuthorityDefaults> authorityDefaults) {
         this.authorityDefaults = authorityDefaults.getIfAvailable(() -> new GrantedAuthorityDefaults("ROLE_"));
+    }
+
+    /**
+     * 便利构造：默认 {@code ROLE_} 前缀（测试与手工装配用）
+     */
+    public RequiresRoleAuthorizer() {
+        this.authorityDefaults = new GrantedAuthorityDefaults("ROLE_");
     }
 
     @Override
@@ -74,6 +86,43 @@ public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer {
     @Override
     public int getOrder() {
         return 10;
+    }
+
+    // ========================= 启动期校验（fail-closed / CWE-862） =========================
+
+    /**
+     * 容器就绪后扫描全部 Bean 的 {@code @RequiresRole}（类级 + 方法级，含元注解归并）：
+     * {@code role = {}} 属"配了等于没配"的配置错误——启动期失败优于运行期静默放行/403 之谜。
+     */
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        ConfigurableApplicationContext applicationContext = event.getApplicationContext();
+        for (String beanName : applicationContext.getBeanDefinitionNames()) {
+            Class<?> beanType = applicationContext.getType(beanName);
+            if (beanType != null) {
+                validate(beanType);
+            }
+        }
+    }
+
+    /** 校验单个类上的 {@code @RequiresRole}（类级 + 方法级），公开供测试直接调用 */
+    public void validate(Class<?> beanType) {
+        RequiresRole classLevel = findMergedAnnotation(beanType, RequiresRole.class);
+        checkRole(beanType, null, classLevel);
+        ReflectionUtils.doWithMethods(beanType, method -> checkRole(beanType,
+                method, findMergedMethodAnnotation(method, RequiresRole.class, beanType)));
+    }
+
+    private static void checkRole(Class<?> beanType, Method method, RequiresRole requiresRole) {
+        if (requiresRole != null && requiresRole.role().length == 0) {
+            throw new IllegalStateException(location(beanType, method)
+                    + "@RequiresRole 的 role 不能为空（空角色即放行所有已认证用户的配置错误，fail-closed 拒绝启动）");
+        }
+    }
+
+    static String location(Class<?> beanType, Method method) {
+        return method == null ? "类[" + beanType.getName() + "] " : "类["
+                + beanType.getName() + "]方法[" + method.getName() + "] ";
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,7 +45,7 @@ final class IdempotentSpelEvaluator {
      */
     static String evaluate(String spel, MethodInvocation invocation) {
         SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();
-        java.lang.reflect.Parameter[] parameters = invocation.getMethod().getParameters();
+        Parameter[] parameters = invocation.getMethod().getParameters();
         Object[] args = invocation.getArguments();
         for (int i = 0; i < parameters.length; i++) {
             context.setVariable(parameters[i].getName(), i < args.length ? args[i] : null);

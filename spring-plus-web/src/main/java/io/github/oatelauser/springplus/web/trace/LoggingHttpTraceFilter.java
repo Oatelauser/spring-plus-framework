@@ -1,6 +1,6 @@
 package io.github.oatelauser.springplus.web.trace;
 
-import io.github.oatelauser.springplus.web.trace.RecordHttp;
+import io.github.oatelauser.springplus.web.utils.LogSanitizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
@@ -75,8 +75,8 @@ public class LoggingHttpTraceFilter extends AbstractHttpTraceFilter implements H
                 request.getQueryString(),
                 request.getContentType(),
                 request.getRemoteAddr(),
-                io.github.oatelauser.springplus.web.utils.LogSanitizer.maskSensitiveValues(requestPayload),
-                io.github.oatelauser.springplus.web.utils.LogSanitizer.maskSensitiveValues(responsePayload));
+                LogSanitizer.maskSensitiveValues(requestPayload),
+                LogSanitizer.maskSensitiveValues(responsePayload));
     }
 
     @Override

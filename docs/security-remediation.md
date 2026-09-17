@@ -15,7 +15,7 @@
 | V04 🔴 | TypeMismatch 回显入参原值 | 消息只保留参数名 + 期望类型 | 编译期审查 + 代码注释 ✅ |
 | V05 🟠 | 匿名主体碰撞 + 内存存储无界 | 容量上限（默认 10 万，构造器可调）满载 fail-closed；AtomicLong；javadoc/skill 红线（多租户必须自定义策略+Redis） | InMemoryIdempotentStoreCapacityTest ✅ |
 | V06 🟠 | FileResources 路径穿越 | normalize + 拒绝 `..`/绝对路径/盘符 | SecurityUtilsTest ✅ |
-| V07/SEC-002 🟠 | 鉴权 fail-open（空权限放行） | 分层 fail-closed：静态空配置**启动期失败**（RequiresAnnotationValidator 扫全 Bean）；动态空集运行期 **DENY** | FailClosedAuthorizationTest + RequiresAnnotationValidatorTest ✅ |
+| V07/SEC-002 🟠 | 鉴权 fail-open（空权限放行） | 分层 fail-closed：静态空配置**启动期失败**（校验内聚于两个授权器，自扫全 Bean）；动态空集运行期 **DENY** | FailClosedAuthorizationTest + RequiresAnnotationValidatorTest ✅ |
 | V08 🟠 | security 无默认拒绝、消费方易裸奔 | security README/skill 红线（必须自配 FilterChain + denyAll）；example 增 `SecurityExampleConfig`（denyAll+白名单）与 `/secure/**` 演示端点 | 冒烟 401/403/200 ✅ |
 | SEC-003 | Authorizer `@Component`+`@Bean` 双注册 | 移除 4 个类的 `@Component`，统一 autoconfig `@Bean` | 编译 + 启动 ✅ |
 | V14 🟠 | 超管短路 `instanceof List` 恒 false | 改 `anyMatch`（Set/List/乱序三态测试锁定） | FailClosedAuthorizationTest ✅ |

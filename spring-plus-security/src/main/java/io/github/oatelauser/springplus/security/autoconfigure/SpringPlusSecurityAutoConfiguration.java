@@ -15,6 +15,7 @@ import org.springframework.security.authorization.method.AuthorizationManagerBef
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,14 +50,6 @@ public class SpringPlusSecurityAutoConfiguration {
         return new RequiresPermissionAuthorizer();
     }
 
-    /**
-     * 授权注解启动期校验器（fail-closed）：空角色/空权限配置在启动期失败，
-     * 而非运行期放行（@RequiresRole(role={})）或运行期 500（@RequiresPermission 空属性）
-     */
-    @Bean
-    public RequiresAnnotationValidator requiresAnnotationValidator() {
-        return new RequiresAnnotationValidator();
-    }
 
     /**
      * 自定义前置权限方法拦截器
@@ -114,7 +107,7 @@ public class SpringPlusSecurityAutoConfiguration {
      */
     private static List<AnnotationAuthorizer> collectAuthorizers(RequiresRoleAuthorizer roleAuthorizer,
             RequiresPermissionAuthorizer permissionAuthorizer, ObjectProvider<AnnotationAuthorizer> provider) {
-        List<AnnotationAuthorizer> authorizers = new java.util.ArrayList<>(
+        List<AnnotationAuthorizer> authorizers = new ArrayList<>(
                 provider.stream().filter(a -> a != roleAuthorizer && a != permissionAuthorizer).toList());
         authorizers.add(roleAuthorizer);
         authorizers.add(permissionAuthorizer);
