@@ -41,7 +41,7 @@ Spring Web 层能力拓展。提供：统一响应、状态码、全局异常（
 
 - `HttpWriterFactory` + `ChunkStreamWriter` / `NdjsonStreamWriter` / `FileDownloadWriter`（`web.stream`）
 - `@Phone` / `@EnumValue` / `@ListValues` / `@NoNullElement` / `@UniqueElement`（`web.validation`）
-- `AssertUtils`（notNull / isTrue / state / hasText / notEmpty×3 / noNullElements，失败抛 `ServiceException`）/ `JsonUtils` / `ApplicationContextHolder` / `BeanUtils`（`web.utils`）
+- `AssertUtils`（notNull / isTrue / state / hasText / notEmpty×3 / noNullElements，失败抛 `ServiceException`）/ `JsonUtils`（`web.utils`）；`ApplicationContextHolder` / `BeanUtils` / `AnnotationUtils` / `LogSanitizer` 等通用工具已迁 `spring-plus-boot`（`boot.utils`，ADR 0003）
 - `@RecordHttp` / `@EnableRecordHttp`（`web.trace`）
 
 ## 决策规则
@@ -51,6 +51,7 @@ Spring Web 层能力拓展。提供：统一响应、状态码、全局异常（
 3. 需要声明"不成立即抛业务异常"的判断，用 `AssertUtils`，不写 if + throw
 4. 错误响应不要手工构造：抛类型化异常，让全局体系渲染（注解 P0 > handler 默认 > Mapper 链 > 兜底）
 5. JSON 一律走 `JsonUtils`（容器 JsonMapper 同源），禁止业务代码自建 mapper
+6. 模块/业务自带 `@RestControllerAdvice`：只声明窄异常类型 + 显式 `@Order`（0~900，全局兜底 `GlobalExceptionAdvice` 为 `LOWEST_PRECEDENCE`）；要渲染就构造 `ErrorDescriptor` 后 `engine.dispatch(...)`，不自己写响应体
 
 ## 返回体规则
 
@@ -71,6 +72,7 @@ return SimpleResponse.fail(BusinessStatus.DATA_NOT_EXIST, id);   // 占位符格
 
 - 业务自定义状态码：业务项目里实现 `ServerStatus` 接口的枚举，或 `ServerStatus.of(code, msg)` 临时构造；不要把业务私有码加回框架
 - 异常映射声明位置优先级：异常类上贴注解 > 独立 `ExceptionMapper` Bean > Controller 方法注解
+- advice 层优先级（与上面的描述解析优先级是两个维度）：模块 advice（显式 `@Order` < `LOWEST_PRECEDENCE`）> 全局 `GlobalExceptionAdvice` 的具体 handler > 其 `Exception.class` 兜底；跨 advice 先到先得，无全局最精确匹配，契约违例启动期由 `ModuleAdviceContractValidator` 告警
 - 错误消息脱敏：不含请求值、ID、堆栈、SQL、类名
 - SSE / NDJSON 接口的异常处理与 JSON 同构，只需换派生注解，不要为流式接口另写 try/catch
 

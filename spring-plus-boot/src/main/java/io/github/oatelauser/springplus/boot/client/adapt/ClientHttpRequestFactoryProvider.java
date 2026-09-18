@@ -2,7 +2,7 @@ package io.github.oatelauser.springplus.boot.client.adapt;
 
 import io.github.oatelauser.springplus.boot.client.ApiClientSettings;
 import io.github.oatelauser.springplus.boot.client.HttpClientEngine;
-import io.github.oatelauser.springplus.web.utils.InsecureTlsHelper;
+import io.github.oatelauser.springplus.boot.utils.InsecureTlsHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.auth.AuthScope;

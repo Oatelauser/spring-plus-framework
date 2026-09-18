@@ -1,6 +1,6 @@
 package io.github.oatelauser.springplus.web.autoconfigure;
 
-import io.github.oatelauser.springplus.web.utils.BeanUtils;
+import io.github.oatelauser.springplus.boot.utils.BeanUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.ApplicationArguments;

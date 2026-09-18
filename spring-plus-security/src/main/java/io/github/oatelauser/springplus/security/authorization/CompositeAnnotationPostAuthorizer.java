@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMergedMethodAnnotation;
+import static io.github.oatelauser.springplus.boot.utils.AnnotationUtils.findMergedMethodAnnotation;
 
 
 /**

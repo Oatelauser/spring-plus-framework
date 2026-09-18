@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import static io.github.oatelauser.springplus.security.authorization.AnnotationAuthorizationDecision.ALLOW;
-import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMergedMethodAnnotation;
+import static io.github.oatelauser.springplus.boot.utils.AnnotationUtils.findMergedMethodAnnotation;
 
 
 /**

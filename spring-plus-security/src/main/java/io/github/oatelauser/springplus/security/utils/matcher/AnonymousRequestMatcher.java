@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 
 import java.util.Set;
 
-import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMethodAnnotation;
+import static io.github.oatelauser.springplus.boot.utils.AnnotationUtils.findMethodAnnotation;
 
 
 /**

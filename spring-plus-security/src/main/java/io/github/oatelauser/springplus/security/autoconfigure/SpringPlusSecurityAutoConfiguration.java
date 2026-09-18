@@ -1,12 +1,18 @@
 package io.github.oatelauser.springplus.security.autoconfigure;
 
+import io.github.oatelauser.springplus.security.advice.SecurityExceptionAdvice;
 import io.github.oatelauser.springplus.security.authorization.*;
+import io.github.oatelauser.springplus.web.autoconfigure.ExceptionHandlingAutoConfiguration;
+import io.github.oatelauser.springplus.web.error.engine.ExceptionOutputEngine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.Pointcut;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 import org.springframework.security.authorization.AuthorizationEventPublisher;
 import org.springframework.security.authorization.method.AuthorizationInterceptorsOrder;
@@ -25,7 +31,7 @@ import java.util.List;
  * @date 2026-02-22
  * @since 1.0
  */
-@AutoConfiguration
+@AutoConfiguration(after = ExceptionHandlingAutoConfiguration.class)
 @RequiredArgsConstructor
 public class SpringPlusSecurityAutoConfiguration {
 
@@ -112,6 +118,24 @@ public class SpringPlusSecurityAutoConfiguration {
         authorizers.add(roleAuthorizer);
         authorizers.add(permissionAuthorizer);
         return authorizers;
+    }
+
+    /**
+     * security 模块级异常 advice（denied 透传 + 认证异常映射 web 错误码）。
+     * <p>
+     * 仅 SERVLET Web 应用且 web 错误引擎就位时装配（{@code after = ExceptionHandlingAutoConfiguration}
+     * 保证引擎 Bean 定义先注册，条件求值确定）；非 Web 应用不引入任何 MVC 依赖。
+     */
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+    @ConditionalOnBean(ExceptionOutputEngine.class)
+    static class SecurityExceptionAdviceConfiguration {
+
+        @Bean
+        public SecurityExceptionAdvice securityExceptionAdvice(ExceptionOutputEngine outputEngine) {
+            return new SecurityExceptionAdvice(outputEngine);
+        }
+
     }
 
 }

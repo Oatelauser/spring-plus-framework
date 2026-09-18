@@ -4,6 +4,21 @@
 
 ## [1.1.0] — 未发布（安全加固版）
 
+### 模块级异常 advice 机制
+
+- **多 advice 共存**：`GlobalExceptionAdvice` 显式 `@Order(Ordered.LOWEST_PRECEDENCE)` 成为全局兜底；模块可自带 `@RestControllerAdvice`（`@Order` 更小即优先，段位约定 0~900）接管自身异常域，Spring 原生"按 order 逐个咨询、第一个匹配者赢"语义
+- **启动期契约校验**：新增 `ModuleAdviceContractValidator`（复用 boot `ControllerAdviceScanUtils` 扫描设施）——对非全局 advice 告警两类违例：声明 `Exception`/`Throwable` 级兜底（将遮蔽全局全部具体 handler）、无显式 `@Order`（与兜底平局、先后由注册顺序决定）；全部仅告警不拦截启动
+- **security 首个落地**：新增 `SecurityExceptionAdvice`（`@Order(100)`，SERVLET 应用且 web 错误引擎就位时自动装配）——`AccessDeniedException` 家族透传给 `ExceptionTranslationFilter`（403 语义保留）；认证异常家族按子类型映射 web 错误码（A0210/A0202/A0203/A0212/A0213/A0230/A0301）经 `ExceptionOutputEngine` 统一渲染为 401
+- `ClientStatus` 新增 `A0212`（用户密码已过期）/ `A0213`（用户账户已过期）
+- web 删除 `SECURITY_DENIED_CLASSES` 按类名透传的妥协（denied 让路由由 security 模块 advice 类型安全接管）
+
+### ⚠️ 模块重组（破坏性，[ADR 0003](./docs/adr/0003-boot-as-base-redis-split.md)）
+
+- **依赖倒置**：`spring-plus-boot` 不再依赖 `spring-plus-web`，改为 `web → boot`、`security → boot`（governor 经 web 传递）——boot 成为家族基础模块；仅需配置加密/优雅停机的应用不再被迫传递引入 web
+- **utils 包迁移**：`AnnotationUtils` / `ApplicationContextHolder` / `ApplicationContextUtils` / `BeanUtils` / `FileResources` / `InsecureTlsHelper` / `LogSanitizer` 由 `io.github.oatelauser.springplus.web.utils` 迁至 `io.github.oatelauser.springplus.boot.utils`（业务 import 需改；`AssertUtils`、`JsonUtils` 留守 web）；`spring.factories` 的 `ApplicationContextInitializer` 注册随迁 boot
+- **Redis 独立成模块**：新坐标 `spring-plus-redis`——`RedisStringOperation` / `CacheUtils` / `KeyValue` + Lua 脚本 + 自动配置，包名 `springplus.boot.redis` → `springplus.redis`；boot 不再传递 Redis 工具，使用方坐标替换
+- **Jackson 化 RedisTemplate**（`spring-plus-redis`）：新增 `jacksonRedisTemplate` Bean（`RedisTemplate<String, Object>`，按名注入、不接管 Boot 默认）——JSON 内嵌 `@class`（Object 值 round-trip 安全）、容器 `JsonMapper` 取副本配置不被 default typing 污染、String key + Jackson value 一把装配；classpath 无 Jackson 时整体退避
+
 ### 安全增强
 
 - **V16**：请求追踪响应侧改有界旁录（直写透传 + 超限占位 + 二进制/multipart 跳过），大响应误标 `@RecordHttp` 不再缓冲整包
@@ -49,6 +64,7 @@
 
 ### 其他
 
+- **发布范围缩减**：`spring-plus-calcite-memory` 自本版本起不再发布到 Maven Central（根 POM `excludeArtifacts` 排除；模块保留在源码仓与 Reactor 中正常构建/测试，需要方请源码或私仓引入。1.0.0 已发布版本不受影响）
 - spring.factories 注册文件修复（web ApplicationContextInitializer 与 boot EnvironmentPostProcessor 的行续接损坏，此前实际未生效）
 - 新增安全回归测试 22 个（全仓 238 → 预计 245+）
 

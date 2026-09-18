@@ -9,7 +9,6 @@ import io.github.oatelauser.springplus.boot.lifecycle.ShutdownHook;
 import io.github.oatelauser.springplus.boot.lifecycle.SmartGracefulShutdownHandler;
 import io.github.oatelauser.springplus.boot.lifecycle.StartupProcess;
 import io.github.oatelauser.springplus.boot.lifecycle.WebServerPostProcessor;
-import io.github.oatelauser.springplus.boot.redis.RedisStringOperation;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,14 +21,14 @@ import org.springframework.boot.ssl.SslBundles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.List;
 
 /**
  * spring-plus-boot 自动配置类
  * <p>
- * Boot 生态装配能力域：Web 服务器生命周期（优雅停机 / 启动过程）、Redis 工具、HTTP 客户端。
+ * Boot 生态装配能力域：Web 服务器生命周期（优雅停机 / 启动过程）、HTTP 客户端。
+ * Redis 工具已按能力域拆出为 spring-plus-redis（ADR 0003）。
  *
  * @author <a href="mailto:yangsheng1993812@gmail.com">Oatelauser</a>
  * @date 2026-09-16
@@ -48,18 +47,6 @@ public class SpringPlusBootAutoConfiguration {
     @ConditionalOnMissingBean
     public SmartGracefulShutdownHandler smartGracefulShutdownHandler(ObjectProvider<List<ShutdownHook>> shutdownHooks) {
         return new SmartGracefulShutdownHandler(shutdownHooks);
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnClass(StringRedisTemplate.class)
-    static class RedisConfiguration {
-
-        @Bean
-        @ConditionalOnMissingBean
-        public RedisStringOperation redisStringOperation(StringRedisTemplate redisTemplate) {
-            return new RedisStringOperation(redisTemplate);
-        }
-
     }
 
     /**

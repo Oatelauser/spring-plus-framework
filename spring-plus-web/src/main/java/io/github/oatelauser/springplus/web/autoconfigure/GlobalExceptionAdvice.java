@@ -12,6 +12,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
@@ -59,10 +61,20 @@ import java.util.concurrent.TimeoutException;
  * 兜底 {@code @ExceptionHandler(Exception.class)} 走 {@link ExceptionOutputEngine#dispatchFallback}，
  * 让 Mapper 链处理（ServiceException/ServerStatus/异常类注解/兜底）。
  *
+ * <h3>多 advice 共存契约（全局兜底位）</h3>
+ * <p>
+ * 本类显式声明 {@code @Order(Ordered.LOWEST_PRECEDENCE)}，是全应用异常处理的<b>最低优先级
+ * 兜底</b>。模块级 advice（如 spring-plus-security 的透传 advice）声明更小的 order 即可优先
+ * 接管——Spring 对多个 advice 按 order 排序后逐个咨询，第一个能匹配的 advice 直接赢，其余
+ * （含本类）不再参与；未匹配任何模块 advice 的异常最终落回本类的具体 handler 与
+ * {@code Exception.class} 兜底。模块段位约定 0~900（security = 100），契约违例由
+ * {@code ModuleAdviceContractValidator} 启动期告警。
+ *
  * @author <a href="mailto:545896770@qq.com">DearYang</a>
  * @date 2023-04-07
  * @since 1.0
  */
+@Order(Ordered.LOWEST_PRECEDENCE)
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
 
@@ -322,34 +334,17 @@ public class GlobalExceptionAdvice {
     // ====================== 兜底异常处理 ======================
 
     /**
-     * Spring Security 拒绝异常的类名前缀（web 模块不依赖 spring-security，按类名透传）：
-     * org.springframework.security.access.AccessDeniedException
-     * org.springframework.security.authorization.AuthorizationDeniedException（其子类）
-     */
-    private static final String[] SECURITY_DENIED_CLASSES = {
-            "org.springframework.security.access.AccessDeniedException",
-            "org.springframework.security.authorization.AuthorizationDeniedException"
-    };
-
-    /**
      * 兜底异常处理：不构造默认描述，交给 Mapper 链（异常类注解 / ServerStatus / 兜底）。
      * <p>
      * 注意：{@code HandlerMethod} 在 Filter / 静态资源 / 请求映射阶段异常时可能为 null，
      * 引擎会从请求属性自行解析。
      * <p>
-     * Spring Security 的拒绝异常（403 语义）必须原样抛出：被本兜底捕获并渲染成
-     * 200 + 系统错误会吞掉 HTTP 语义；rethrow 后由 Security 的
-     * {@code ExceptionTranslationFilter} / 方法级 denied handler 翻译为 403。
+     * Spring Security 的拒绝异常透传已由 security 模块自己的
+     * {@code SecurityExceptionAdvice}（{@code @Order(100)}，先于本兜底被咨询）接管——
+     * 本模块不再按类名字符串匹配让路（web 不依赖 spring-security 的历史妥协随之移除）。
      */
     @ExceptionHandler(Exception.class)
     public Object handleException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
-        for (Class<?> type = ex.getClass(); type != null; type = type.getSuperclass()) {
-            for (String denied : SECURITY_DENIED_CLASSES) {
-                if (denied.equals(type.getName())) {
-                    throw ex instanceof RuntimeException runtime ? runtime : new RuntimeException(ex);
-                }
-            }
-        }
         return this.engine.dispatchFallback(ex, request, response);
     }
 

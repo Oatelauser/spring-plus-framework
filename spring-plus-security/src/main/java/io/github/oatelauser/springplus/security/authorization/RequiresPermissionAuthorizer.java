@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import static io.github.oatelauser.springplus.security.authorization.RequiresRoleAuthorizer.location;
-import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMergedMethodAnnotation;
+import static io.github.oatelauser.springplus.boot.utils.AnnotationUtils.findMergedMethodAnnotation;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 

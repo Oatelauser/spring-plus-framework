@@ -10,14 +10,9 @@
 
     <artifactId>spring-plus-boot</artifactId>
     <name>spring-plus-boot</name>
-    <description>Spring Boot 生态能力拓展：HTTP 客户端（拦截器链/重试/GZIP/指标）、Redis 工具、配置文件加密、优雅停机</description>
+    <description>Spring Boot 生态能力拓展：基础工具（utils）、HTTP 客户端（拦截器链/重试/GZIP/指标）、配置文件加密、优雅停机</description>
 
     <dependencies>
-        <dependency>
-            <groupId>io.github.oatelauser</groupId>
-            <artifactId>spring-plus-web</artifactId>
-        </dependency>
-
         <!-- 自动配置基础 / 生命周期 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -33,13 +28,6 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Redis 工具域（CacheUtils/RedisStringOperation + Lua） -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
             <scope>provided</scope>
         </dependency>
 

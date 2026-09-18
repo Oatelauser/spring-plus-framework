@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.boot.redis;
+package io.github.oatelauser.springplus.redis;
 
 /**
  * 缓存定义

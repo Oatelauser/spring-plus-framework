@@ -50,6 +50,8 @@ public enum ClientStatus implements ServerStatus {
     ACCOUNT_DISABLED("A0203", "用户账户已作废"),
     PASSWORD_ERROR("A0210", "用户密码错误"),
     PASSWORD_ERROR_EXCEED_LIMIT("A0211", "用户输入密码错误次数超限"),
+    PASSWORD_EXPIRED("A0212", "用户密码已过期"),
+    ACCOUNT_EXPIRED("A0213", "用户账户已过期"),
     LOGIN_EXPIRED("A0230", "用户登录已过期"),
     VERIFY_CODE_ERROR("A0240", "用户验证码错误"),
     VERIFY_CODE_EXCEED_LIMIT("A0241", "用户验证码尝试次数超限"),

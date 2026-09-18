@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.web.utils;
+package io.github.oatelauser.springplus.boot.utils;
 
 import org.junit.jupiter.api.Test;
 

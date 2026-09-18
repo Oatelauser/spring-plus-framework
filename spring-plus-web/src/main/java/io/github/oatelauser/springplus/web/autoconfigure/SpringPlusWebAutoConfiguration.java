@@ -3,7 +3,7 @@ package io.github.oatelauser.springplus.web.autoconfigure;
 import io.github.oatelauser.springplus.web.trace.AnnotationHandlerMethodPostProcessor;
 import io.github.oatelauser.springplus.web.stream.HttpResponseWriter;
 import io.github.oatelauser.springplus.web.stream.HttpWriterFactory;
-import io.github.oatelauser.springplus.web.utils.ApplicationContextHolder;
+import io.github.oatelauser.springplus.boot.utils.ApplicationContextHolder;
 import io.github.oatelauser.springplus.web.utils.JsonUtils;
 import io.github.oatelauser.springplus.web.validation.clazz.ClassValidatorPostProcessor;
 import org.springframework.beans.factory.ObjectProvider;

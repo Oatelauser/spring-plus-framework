@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.boot.redis;
+package io.github.oatelauser.springplus.redis;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,14 +1,16 @@
 # spring-plus-boot
 
-Spring Boot 生态能力拓展：依赖 Boot 装配生态才工作的工具集——HTTP 客户端、Redis 工具、配置文件加密、优雅停机。
+家族基础模块 + Spring Boot 生态能力拓展：通用工具（反射 / 容器访问 / 资源 / 日志脱敏 / TLS）、HTTP 客户端、配置文件加密、优雅停机。
+
+> 1.1.0 起 Redis 工具拆出为独立模块 [`spring-plus-redis`](../spring-plus-redis/README.md)（ADR 0003）。
 
 ## 能力清单
 
 | 能力 | 入口 |
 |---|---|
+| 通用工具 | `boot.utils`：`AnnotationUtils` / `BeanUtils` / `ApplicationContextHolder` / `ApplicationContextUtils` / `FileResources` / `LogSanitizer` / `InsecureTlsHelper`（@Deprecated）/ `ControllerAdviceScanUtils`（advice 扫描设施） |
 | HTTP 客户端 | `ApiClient` / `ApiClient.builder()`：拦截器链、重试、GZIP 压缩、认证注入、Micrometer 打点 |
 | 客户端适配 | `ClientHttpRequestFactoryProvider`（httpclient5 可选引擎）、`AuthProvider` 认证扩展点 |
-| Redis 工具 | `CacheUtils` / `RedisStringOperation`（Lua 脚本原子操作）/ `KeyValue` |
 | 配置加密 | `ConfigCipher` / `ConfigEncryptor` / `EncryptedPropertyEnvironmentPostProcessor`（`ENC(...)` 密文自动解密） |
 | 优雅停机 | `SmartGracefulShutdownHandler` / `ShutdownHook` / `WebServerPostProcessor` |
 
@@ -22,7 +24,7 @@ Spring Boot 生态能力拓展：依赖 Boot 装配生态才工作的工具集�
 </dependency>
 ```
 
-依赖 `spring-plus-web`（传递引入）。
+无内部依赖（家族基础模块）；`spring-plus-web` / `spring-plus-security` 依赖本模块（ADR 0003 依赖倒置）。
 
 ## HTTP 客户端
 
@@ -48,18 +50,6 @@ ApiClient github = ApiClient.builder()
 
 - classpath 存在 `MeterRegistry` 时自动为**所有** ApiClient Bean（含业务自建）注入 `api.client.requests` 指标
 - httpclient5 为 provided 可选引擎，缺席时自动降级
-
-## Redis 工具（含批量护栏，1.1.0+）
-
-- `batchGet`/`batchDelete(pattern)` 的 pattern **必须包含实质前缀**（首个 `*` 前有字母数字，如 `user:*`）——纯通配（`*`/`*:*`）直接拒绝，防全库 SCAN/删除
-- `batchGet` 单次返回上限默认 **1000** 条（`setMaxBatchGetResults` 可调），超限 fail-fast 提示收紧 pattern
-
-```java
-// RedisStringOperation 由自动配置注入（容器存在 StringRedisTemplate 时生效）
-redisStringOperation.incrementAndExpire("counter:login:" + userId, Duration.ofMinutes(30));
-```
-
-附带 3 个 Lua 脚本（`bdel` / `bget` / `expire_increment`）保证原子性。Redis 依赖为 provided——纯 Web 应用不受影响。
 
 ## 配置加密
 
@@ -91,4 +81,4 @@ spring-plus:
 
 - 不配置 `spring-plus.client.base-url` 时不装配默认 ApiClient，多客户端场景一律 `builder()` 自建
 - `allow-insecure` 默认关闭，开启即信任所有证书，仅限内网调试
-- 本模块定位是"依赖 Boot 装配生态的工具域"，不要把它当作全框架的统一装配层
+- 本模块是家族基础模块 + "依赖 Boot 装配生态的工具域"，不是全框架的统一装配层

@@ -26,7 +26,7 @@ io.github.oatelauser.springplus.web
 ├── stream/      流式响应写入器（原 servlet 包，名实修正）
 ├── trace/       HTTP 请求追踪（原 process 包；@RecordHttp 注解同包）
 ├── validation/  校验注解（field / collection / clazz 三层）
-├── utils/       ApplicationContextHolder / JsonUtils / BeanUtils / FileResources / AssertUtils（运行时断言） 等
+├── utils/       AssertUtils（运行时断言）/ JsonUtils；通用工具已迁 spring-plus-boot 的 boot.utils（ADR 0003）
 └── autoconfigure/ SpringPlusWebAutoConfiguration / ExceptionHandlingAutoConfiguration / GlobalExceptionProperties
 ```
 

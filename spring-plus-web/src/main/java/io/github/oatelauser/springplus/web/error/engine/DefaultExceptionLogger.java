@@ -5,7 +5,7 @@ import io.github.oatelauser.springplus.web.error.ServiceException;
 import io.github.oatelauser.springplus.web.error.descriptor.ErrorDescriptor;
 import io.github.oatelauser.springplus.web.error.descriptor.LogStackPolicy;
 import io.github.oatelauser.springplus.web.error.descriptor.OutputProtocol;
-import io.github.oatelauser.springplus.web.utils.LogSanitizer;
+import io.github.oatelauser.springplus.boot.utils.LogSanitizer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

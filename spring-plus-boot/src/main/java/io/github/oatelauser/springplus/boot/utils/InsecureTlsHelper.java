@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.web.utils;
+package io.github.oatelauser.springplus.boot.utils;
 
 import javax.net.ssl.*;
 import java.security.KeyManagementException;

@@ -17,6 +17,8 @@
 
 ## 坐标
 
+> ⚠️ 自 1.0.1 起本模块**不再发布 Maven Central**（仅 1.0.0 在仓）。请源码引入或发布到私有仓库后按下方坐标使用。
+
 ```xml
 <dependency>
     <groupId>io.github.oatelauser</groupId>

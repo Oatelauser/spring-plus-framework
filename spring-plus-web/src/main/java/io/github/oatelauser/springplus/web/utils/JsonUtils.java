@@ -1,5 +1,6 @@
 package io.github.oatelauser.springplus.web.utils;
 
+import io.github.oatelauser.springplus.boot.utils.ApplicationContextHolder;
 import io.github.oatelauser.springplus.web.autoconfigure.SpringPlusWebAutoConfiguration.JacksonConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;

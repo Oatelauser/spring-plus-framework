@@ -5,6 +5,7 @@ import io.github.oatelauser.springplus.web.error.engine.ExceptionLogger;
 import io.github.oatelauser.springplus.web.error.engine.ExceptionOutputEngine;
 import io.github.oatelauser.springplus.web.error.engine.HandlerExceptionAnnotationProcessor;
 import io.github.oatelauser.springplus.web.error.engine.OutputProtocolResolver;
+import io.github.oatelauser.springplus.web.error.advice.ModuleAdviceContractValidator;
 import io.github.oatelauser.springplus.web.error.mapper.DefaultExceptionMapper;
 import io.github.oatelauser.springplus.web.error.mapper.ExceptionClassAnnotationMapper;
 import io.github.oatelauser.springplus.web.error.mapper.ExceptionMapper;
@@ -17,6 +18,7 @@ import io.github.oatelauser.springplus.web.error.output.SseExceptionProcessor;
 import io.github.oatelauser.springplus.web.error.sse.SseConnectionFactory;
 import io.github.oatelauser.springplus.web.error.sse.SseExceptionEmitter;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -194,6 +196,15 @@ public class ExceptionHandlingAutoConfiguration {
     @ConditionalOnMissingBean
     public SseConnectionFactory sseConnectionFactory(SseExceptionEmitter exceptionEmitter) {
         return new SseConnectionFactory(exceptionEmitter);
+    }
+
+    /**
+     * 模块级 advice 契约启动期校验（规则一/二均告警，见该类 javadoc）。
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public ModuleAdviceContractValidator moduleAdviceContractValidator(ConfigurableListableBeanFactory beanFactory) {
+        return new ModuleAdviceContractValidator(beanFactory);
     }
 
 }

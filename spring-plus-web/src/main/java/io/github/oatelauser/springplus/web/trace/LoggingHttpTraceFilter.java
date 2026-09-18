@@ -1,6 +1,6 @@
 package io.github.oatelauser.springplus.web.trace;
 
-import io.github.oatelauser.springplus.web.utils.LogSanitizer;
+import io.github.oatelauser.springplus.boot.utils.LogSanitizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.github.oatelauser.springplus.web.utils.AnnotationUtils.findMergedMethodAnnotation;
+import static io.github.oatelauser.springplus.boot.utils.AnnotationUtils.findMergedMethodAnnotation;
 
 /**
  * 基于日志输出的 HTTP 请求/响应记录器。

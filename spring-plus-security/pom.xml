@@ -10,12 +10,17 @@
 
     <artifactId>spring-plus-security</artifactId>
     <name>spring-plus-security</name>
-    <description>声明式鉴权域：以注解（@RequiresRole/@RequiresPermission/@Authorize 等）表达角色与权限要求，替代 SpEL 配置</description>
+    <description>声明式鉴权域：以注解表达角色与权限要求，替代 SpEL 配置</description>
 
     <dependencies>
         <dependency>
             <groupId>io.github.oatelauser</groupId>
             <artifactId>spring-plus-web</artifactId>
+        </dependency>
+        <!-- 授权器直接使用 boot.utils.AnnotationUtils（ADR 0003 依赖倒置） -->
+        <dependency>
+            <groupId>io.github.oatelauser</groupId>
+            <artifactId>spring-plus-boot</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
