@@ -72,7 +72,7 @@ public SimpleResponse<User> user(@RequestParam Long id) {
     return SimpleResponse.ok(userService.get(id));
 }
 
-// 分页：Page{ item, totalCount, pageNum, pageSize, totalPage }
+// 分页：Page{ item, total, pageNum, pageSize, totalPage }
 @GetMapping("/users")
 public PageResponse<User> users(UserPageRequest request) {
     return PageResponse.ok(request, total, userService.page(request));

@@ -1,98 +1,57 @@
 ---
 name: spring-plus-web-starter
-description: 在已引入 io.github.oatelauser:spring-plus-web-starter 的项目中进行 Controller、响应体、异常处理、参数校验、流式响应相关代码的编写、修改或排障时优先使用。本 skill 定义统一响应对象 SimpleResponse、状态码体系、AssertUtils 运行时断言、三协议异常注解、流式写入器、校验注解的使用约定与已知陷阱。
+description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.github.oatelauser:spring-plus-web-starter）。覆盖：SimpleResponse/PageResponse 统一响应与分页、00000/A0/B0/C0 状态码体系、ServiceException 与 AssertUtils 业务断言、@JsonExceptionResponse/@SseExceptionResponse/@NdjsonExceptionResponse 三协议全局异常处理、模块级 @RestControllerAdvice 与 @Order 段位、HttpWriterFactory 流式响应（SSE/NDJSON/Chunk/文件下载）、@Phone/@EnumValue/@ClassValidator 校验注解、@RecordHttp 请求追踪、JsonUtils。编写或修改 Controller/响应体/错误码/异常映射，排查接口返回结构、参数校验失败、SSE/NDJSON 流式输出问题时使用。鉴权注解在 spring-plus-security-starter；幂等防重在 spring-plus-governor-starter；HTTP 客户端/配置加密在 spring-plus-boot-starter。
 ---
 
 # spring-plus-web-starter
 
-这个 skill 直接给 AI 使用。
+这个 skill 直接给 AI 使用。本文件是导航与全模块规则；各能力域的 API 细节、可抄示例与陷阱在 `references/`，按任务加载。
 
-## 前置假设
+## 按需加载参考文档
 
-- 项目已引入 `io.github.oatelauser:spring-plus-web-starter`
-- Boot 应用零配置接入（自动配置经 `AutoConfiguration.imports` 注册）
+| 任务涉及 | 加载 |
+|---|---|
+| 统一响应、分页、状态码/错误码设计、业务枚举实现 ServerStatus | [references/response.md](references/response.md) |
+| 异常体系：ServiceException、异常映射注解、ExceptionMapper、模块级 advice、错误渲染定制、`spring-plus.web.error-response.*` | [references/exception-handling.md](references/exception-handling.md) |
+| 流式响应：SSE 三档、NDJSON/Chunk/文件下载写入器、流内异常补写、@RecordHttp 请求追踪 | [references/streaming.md](references/streaming.md) |
+| 参数校验：@Phone/@EnumValue/@ListValues/集合元素/类级 @ClassValidator | [references/validation.md](references/validation.md) |
+| JsonUtils、AssertUtils 全部重载、spring.jackson.* 扩展键 | [references/json-and-assert.md](references/json-and-assert.md) |
 
-## 模块定位
+只做小改动且明确知道规则时可不加载；涉及具体 API 用法/配置键/多协议输出时必须加载对应文件。
 
-Spring Web 层能力拓展。提供：统一响应、状态码、全局异常（JSON/SSE/NDJSON）、流式写入器、分页、校验注解、请求追踪、运行时断言、JSON 门面。
+## 能力归属（防找错模块）
 
-注意以下能力**不在**本模块（别找错地方）：
+本模块：统一响应、状态码、分页、全局异常（JSON/SSE/NDJSON）、流式写入器、校验注解、请求追踪、AssertUtils、JsonUtils。
 
-- HTTP 客户端 / Redis 工具 / 配置加密 / 优雅停机 → `spring-plus-boot-starter`
+不在此模块：
+
+- HTTP 客户端 / 配置加密 / 优雅停机 / `ApplicationContextHolder` 等通用工具 → `spring-plus-boot-starter`（`boot.utils`，ADR 0003 迁出）
 - 幂等 / 防重 → `spring-plus-governor-starter`
-- 鉴权注解 → `spring-plus-security-starter`
+- 鉴权注解 / @Principal → `spring-plus-security-starter`
+- Redis 工具 → `spring-plus-redis-starter`
 
-## 优先复用的公开类型
+## 核心决策规则（几乎所有任务适用）
 
-响应与状态码（`io.github.oatelauser.springplus.web.response`）：
+1. Controller 返回值一律 `SimpleResponse<T>` / `PageResponse<T>`，无数据用 `SimpleResponse<Void>`；不裸返 String/Long/Boolean/List，不自建 `Result`/`ApiResponse` 平行封装
+2. 分页：入参继承 `BasePageRequest`，返回 `PageResponse.ok(request, total, records)`（total 在前）
+3. "不成立即抛业务异常"的判断用 `AssertUtils` 收敛，不写 if + throw
+4. 错误响应不手工构造：抛类型化异常（自带映射或注解声明），让全局体系渲染
+5. JSON 一律走 `JsonUtils`，禁止业务代码自建 `JsonMapper`/`ObjectMapper`
+6. 业务/模块自带 `@RestControllerAdvice` 必须满足：只声明窄异常类型 + 显式 `@Order`（0~900）；要渲染就构造 `ErrorDescriptor` 交 `ExceptionOutputEngine.dispatch(...)`，不自己写响应体
+7. 业务状态码定义在业务项目（实现 `ServerStatus` 的枚举），不回加进框架
 
-- `SimpleResponse<T>`（工厂 `ok()` / `fail()`）
-- `PageResponse<T>` / `Page` / `BasePageRequest` / `FieldErrorInfo`
-- `ServerStatus`（接口）/ `ClientStatus` / `BusinessStatus` / `SystemStatus` / `CommonStatus` / `ServerStatusProvider`
+## 红线
 
-异常（`web.error`）：
+- `SimpleResponse` / `Page` 的字段名与顺序是线上契约，禁止修改
+- `Page.item` 是单数（不是 items/records/list）；总数字段 JSON 键是 `total`（javadoc 曾误注 `totalCount`，见 references/response.md）
+- 流式输出必须经 `HttpWriterFactory` 取写入器，不手写响应头绕过
+- 错误消息脱敏：不含请求值、ID、堆栈、SQL、内部类名
+- SSE/NDJSON 接口的异常处理与 JSON 同构（换派生注解即可），不为流式接口另写 try/catch
 
-- `ServiceException`（`.withStack()` / `.signal()` 链式开关）
-- `@JsonExceptionResponse` / `@SseExceptionResponse` / `@NdjsonExceptionResponse` / `@ExceptionResponse`
-- `ExceptionMapper`（SPI）/ `LogStackPolicy`
-- `SseConnection` / `SseConnectionFactory` / `SseExceptionEmitter`（`error.sse`）
+## 已知陷阱（详见对应 references）
 
-流式与工具：
-
-- `HttpWriterFactory` + `ChunkStreamWriter` / `NdjsonStreamWriter` / `FileDownloadWriter`（`web.stream`）
-- `@Phone` / `@EnumValue` / `@ListValues` / `@NoNullElement` / `@UniqueElement`（`web.validation`）
-- `AssertUtils`（notNull / isTrue / state / hasText / notEmpty×3 / noNullElements，失败抛 `ServiceException`）/ `JsonUtils`（`web.utils`）；`ApplicationContextHolder` / `BeanUtils` / `AnnotationUtils` / `LogSanitizer` 等通用工具已迁 `spring-plus-boot-starter`（`boot.utils`，ADR 0003）
-- `@RecordHttp` / `@EnableRecordHttp`（`web.trace`）
-
-## 决策规则
-
-1. Controller 返回值一律 `SimpleResponse<T>` / `PageResponse<T>`；Void 用 `SimpleResponse<Void>`
-2. 分页入参继承 `BasePageRequest`，响应用 `PageResponse.ok(request, total, list)`
-3. 需要声明"不成立即抛业务异常"的判断，用 `AssertUtils`，不写 if + throw
-4. 错误响应不要手工构造：抛类型化异常，让全局体系渲染（注解 P0 > handler 默认 > Mapper 链 > 兜底）
-5. JSON 一律走 `JsonUtils`（容器 JsonMapper 同源），禁止业务代码自建 mapper
-6. 模块/业务自带 `@RestControllerAdvice`：只声明窄异常类型 + 显式 `@Order`（0~900，全局兜底 `GlobalExceptionAdvice` 为 `LOWEST_PRECEDENCE`）；要渲染就构造 `ErrorDescriptor` 后 `engine.dispatch(...)`，不自己写响应体
-
-## 返回体规则
-
-```java
-return SimpleResponse.ok(vo);
-return SimpleResponse.ok();
-return PageResponse.ok(request, total, records);
-return SimpleResponse.fail(BusinessStatus.DATA_NOT_EXIST, id);   // 占位符格式化
-```
-
-强约束：
-
-- 不要裸返回 `String` / `Long` / `Boolean` / `List<T>`
-- 不要自建 `Result` / `ApiResponse` / `PageResult` 平行封装
-- `Page` 字段固定为 `item / totalCount / pageNum / pageSize / totalPage`（单数 `item` 是项目约定）
-
-## 异常与错误码规则
-
-- 业务自定义状态码：业务项目里实现 `ServerStatus` 接口的枚举，或 `ServerStatus.of(code, msg)` 临时构造；不要把业务私有码加回框架
-- 异常映射声明位置优先级：异常类上贴注解 > 独立 `ExceptionMapper` Bean > Controller 方法注解
-- advice 层优先级（与上面的描述解析优先级是两个维度）：模块 advice（显式 `@Order` < `LOWEST_PRECEDENCE`）> 全局 `GlobalExceptionAdvice` 的具体 handler > 其 `Exception.class` 兜底；跨 advice 先到先得，无全局最精确匹配，契约违例启动期由 `ModuleAdviceContractValidator` 告警
-- 错误消息脱敏：不含请求值、ID、堆栈、SQL、类名
-- SSE / NDJSON 接口的异常处理与 JSON 同构，只需换派生注解，不要为流式接口另写 try/catch
-
-## 校验规则
-
-- `@Phone` / `@EnumValue` 空值默认通过；必填字段叠加 `@NotBlank` / `@NotNull`
-- 集合元素约束用 `@NoNullElement` / `@UniqueElement`，取值范围用 `@ListValues`
-
-## 不要这样做
-
-- 不要修改 `SimpleResponse` / `Page` 的字段名（线上契约）
-- 不要在业务代码里解析 `details` 的内部结构之外再造错误清单
-- 不要绕过 `HttpWriterFactory` 手写响应头去实现流式输出
-- 不要假设 `long-to-string` 已开启（默认关，需要时配 `spring.jackson.long-to-string=true`）
-
-## 已知注意事项
-
-- BODY 级日志与请求追踪旁录已自动掩码敏感键（LogSanitizer 默认键集），但非默认命中的敏感字段（自定义业务键）仍会落日志——新增敏感字段时评估扩展键集
-
-- 成功码唯一（`00000`），`getSuccess()` 不存在"CREATED 二档"歧义——这是与双成功码体系的有意差异
-- `spring.jackson.datetime-format` / `time-format` / `long-to-string` 是框架扩展键，Boot 官方文档查不到
-- `ClassValidatorPostProcessor` 反射 hibernate-validator 内部 API，HV 版本锁定 9.1.0.Final
-- 非 Boot 环境（无自动配置）时 `JsonUtils.shared()` 回落自建实例，行为与容器实例一致（时间格式走默认值）
+- `@Valid @RequestBody` 在 Spring 7 是 fail-fast，violations 只有单条；非 body 参数校验聚合全部结果（`references/validation.md`）
+- `@Phone`/`@EnumValue` 空值默认通过，必填须叠加 `@NotBlank`/`@NotNull`（`references/validation.md`）
+- `spring.jackson.datetime-format`/`time-format`/`long-to-string` 是框架扩展键，Boot 官方文档查不到；`long-to-string` 默认关（`references/json-and-assert.md`）
+- 模块 advice 声明 `Exception`/`Throwable` 兜底或无显式 `@Order` 会被启动期 `ModuleAdviceContractValidator` 告警（`references/exception-handling.md`）
+- 敏感键日志掩码只覆盖 `LogSanitizer` 默认键集，自定义业务敏感字段需评估扩展（`boot-starter` 的 utils）

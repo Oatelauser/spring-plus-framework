@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 分页数据载体
  * <p>
- * 字段命名约定：{@code item}（当前页记录列表，单数命名是项目约定）、{@code totalCount}（总记录数）、
+ * 字段命名约定：{@code item}（当前页记录列表，单数命名是项目约定）、{@code total}（总记录数，字段即 JSON 键）、
  * {@code pageNum}（当前页码）、{@code pageSize}（每页条数）、{@code totalPage}（总页数，工厂内自动计算）。
  *
  * @author <a href="mailto:yangsheng1993812@gmail.com">Oatelauser</a>

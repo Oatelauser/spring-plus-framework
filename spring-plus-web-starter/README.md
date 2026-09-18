@@ -71,8 +71,8 @@ JSON 结构（字段顺序即线上契约）：
 ```java
 class UserPageRequest extends BasePageRequest { private String keyword; }
 
-PageResponse.ok(request, records, total)
-// data: { "item": [...], "totalCount": 57, "pageNum": 1, "pageSize": 10, "totalPage": 6 }
+PageResponse.ok(request, total, records)
+// data: { "item": [...], "total": 57, "pageNum": 1, "pageSize": 10, "totalPage": 6 }
 ```
 
 `BasePageRequest` 自带 `pageNum`（默认 1）与 `pageSize`（默认 10，上限 500 防深分页）校验。

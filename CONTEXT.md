@@ -45,7 +45,7 @@ _Avoid_: HTTP 状态码数字充当业务码
 失败响应中专有的结构化补充信息（字段错误清单、限流配额等）；成功响应永远为 null。data 与 details 互斥。
 
 **Page**:
-分页数据载体，字段 item（当前页记录列表，单数命名是项目约定）/ totalCount（总记录数）/ pageNum（当前页码）/ pageSize（每页条数）/ totalPage（总页数）。
+分页数据载体，字段 item（当前页记录列表，单数命名是项目约定）/ total（总记录数）/ pageNum（当前页码）/ pageSize（每页条数）/ totalPage（总页数）。
 _Avoid_: list、records、total、totalItem、startPage、pages
 
 **PageResponse**:
