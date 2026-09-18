@@ -34,7 +34,7 @@ Redis 能力域独立模块（ADR 0003，自 `spring-plus-boot-starter` 拆出�
 <dependency>
     <groupId>io.github.oatelauser</groupId>
     <artifactId>spring-plus-redis-starter</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
