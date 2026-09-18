@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.oatelauser</groupId>
+        <artifactId>spring-plus-framework</artifactId>
+        <version>1.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>spring-plus-web-starter</artifactId>
+    <name>spring-plus-web-starter</name>
+    <description>Spring Web 能力拓展：统一响应（SimpleResponse / 状态码体系）、全局异常处理（JSON/SSE/NDJSON）、流式响应写入器、校验注解、请求追踪</description>
+
+    <dependencies>
+        <!-- 基础工具（AnnotationUtils/BeanUtils/LogSanitizer 等，ADR 0003 依赖倒置） -->
+        <dependency>
+            <groupId>io.github.oatelauser</groupId>
+            <artifactId>spring-plus-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Servlet API：流式写入器直写响应流 -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+
+        <!-- Spring Web/MVC：全局异常 Advice、拦截器、请求上下文 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <!-- Jackson 3（Boot 4 / tools.jackson）：JsonUtils / SSE / NDJSON 序列化 -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- 校验注解（@Phone/@EnumValue 等）面向 jakarta.validation API 编程 -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ClassValidatorPostProcessor 反射依赖 HV 内部 API（版本由根 POM 锁定） -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Boot 4 拆分模块：JsonMapperBuilderCustomizer / ValidationConfigurationCustomizer 所在 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-jackson</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-validation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 全局异常处理覆盖 org.springframework.dao 异常族（DataAccessException 等）。
+             compile：GlobalExceptionAdvice 方法签名直接引用 dao 异常类，必须传递给消费方，
+             否则消费方 classpath 无 spring-tx 时类内省抛 NoClassDefFoundError -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+
+        <!-- 本模块自带自动配置（异常处理 / HandlerAdapter / 请求追踪注册） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure-processor</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- spring-test 的 requestTo(...) 等 matcher 签名引用 hamcrest（spring-test 里是 optional） -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

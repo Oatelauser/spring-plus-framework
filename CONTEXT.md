@@ -6,19 +6,19 @@
 
 ### 模块（能力域）
 
-**spring-plus-web**:
+**spring-plus-web-starter**:
 Spring Web（非 Boot）能力拓展域：统一响应、全局异常体系、流式写入器、校验注解、请求追踪、公共工具。
 _Avoid_: web-core、spring-web-framework
 
-**spring-plus-boot**:
+**spring-plus-boot-starter**:
 Spring Boot 生态能力拓展域：HTTP 客户端、Redis 工具、配置加密、优雅停机，及本域自动装配。
 _Avoid_: spring-plus-web-boot（本项目不做「核心库 + starter 装配层」模式，按能力域拆分）
 
-**spring-plus-governor**:
+**spring-plus-governor-starter**:
 服务治理域：幂等、防重复提交；限流、熔断等治理能力未来也归此域。
 _Avoid_: 把幂等视为 web 域能力
 
-**spring-plus-security**:
+**spring-plus-security-starter**:
 声明式鉴权域：以注解表达角色/权限要求的鉴权模型。
 
 **spring-plus-calcite-memory**:

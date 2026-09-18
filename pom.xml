@@ -5,18 +5,18 @@
 
     <groupId>io.github.oatelauser</groupId>
     <artifactId>spring-plus-framework</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>spring-plus-framework</name>
     <description>Spring Web / Spring Boot 能力拓展公共库：统一响应、全局异常处理（JSON/SSE/NDJSON）、流式响应、服务治理（幂等防重）、声明式鉴权、内存 SQL 查询</description>
     <url>https://github.com/Oatelauser/spring-plus-framework</url>
 
     <modules>
-        <module>spring-plus-web</module>
-        <module>spring-plus-boot</module>
-        <module>spring-plus-redis</module>
-        <module>spring-plus-governor</module>
-        <module>spring-plus-security</module>
+        <module>spring-plus-web-starter</module>
+        <module>spring-plus-boot-starter</module>
+        <module>spring-plus-redis-starter</module>
+        <module>spring-plus-governor-starter</module>
+        <module>spring-plus-security-starter</module>
         <module>spring-plus-calcite-memory</module>
         <module>examples/spring-boot-web-example</module>
     </modules>
@@ -70,22 +70,22 @@
             <!-- 内部模块 -->
             <dependency>
                 <groupId>io.github.oatelauser</groupId>
-                <artifactId>spring-plus-web</artifactId>
+                <artifactId>spring-plus-web-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.oatelauser</groupId>
-                <artifactId>spring-plus-boot</artifactId>
+                <artifactId>spring-plus-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.oatelauser</groupId>
-                <artifactId>spring-plus-governor</artifactId>
+                <artifactId>spring-plus-governor-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.oatelauser</groupId>
-                <artifactId>spring-plus-security</artifactId>
+                <artifactId>spring-plus-security-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

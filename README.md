@@ -1,6 +1,6 @@
 # spring-plus-framework
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.oatelauser/spring-plus-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.oatelauser/spring-plus-web)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.oatelauser/spring-plus-web-starter.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.oatelauser/spring-plus-web-starter)
 [![CI](https://github.com/Oatelauser/spring-plus-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/Oatelauser/spring-plus-framework/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Changelog](https://img.shields.io/badge/changelog-1.0.1%20dev-blue)](CHANGELOG.md)
@@ -15,17 +15,17 @@
 
 | Module | Provides |
 |---|---|
-| `spring-plus-boot` | Family base module: shared utilities (reflection / context / JSON-free helpers), HTTP client (interceptor chain / retry / GZIP / metrics), config-file encryption (`ENC(...)`), graceful shutdown |
-| `spring-plus-web` | Unified response (`SimpleResponse`, A0/B0/C0 status codes), global exception handling across **JSON / SSE / NDJSON** protocols with **module-level advice precedence** (global fallback last), streaming response writers, pagination, validation annotations, runtime assertions (`AssertUtils`) |
-| `spring-plus-redis` | Redis utilities: `StringRedisTemplate` enhancement (Lua batch get/delete, atomic increment-with-expiry, wildcard guard) + ready-made Jackson-serialized `RedisTemplate<String,Object>` (`jacksonRedisTemplate`) |
-| `spring-plus-governor` | Idempotency & repeat-submit protection (`@Idempotent` / `@RepeatSubmit`) |
-| `spring-plus-security` | Declarative authorization: `@RequiresRole` / `@RequiresPermission` annotations replacing SpEL; module-level exception advice (denied pass-through + auth-exception error-code mapping) |
+| `spring-plus-boot-starter` | Family base module: shared utilities (reflection / context / JSON-free helpers), HTTP client (interceptor chain / retry / GZIP / metrics), config-file encryption (`ENC(...)`), graceful shutdown |
+| `spring-plus-web-starter` | Unified response (`SimpleResponse`, A0/B0/C0 status codes), global exception handling across **JSON / SSE / NDJSON** protocols with **module-level advice precedence** (global fallback last), streaming response writers, pagination, validation annotations, runtime assertions (`AssertUtils`) |
+| `spring-plus-redis-starter` | Redis utilities: `StringRedisTemplate` enhancement (Lua batch get/delete, atomic increment-with-expiry, wildcard guard) + ready-made Jackson-serialized `RedisTemplate<String,Object>` (`jacksonRedisTemplate`) |
+| `spring-plus-governor-starter` | Idempotency & repeat-submit protection (`@Idempotent` / `@RepeatSubmit`) |
+| `spring-plus-security-starter` | Declarative authorization: `@RequiresRole` / `@RequiresPermission` annotations replacing SpEL; module-level exception advice (denied pass-through + auth-exception error-code mapping) |
 | `spring-plus-calcite-memory` | In-memory SQL over POJO/Map/List tables, powered by Apache Calcite. *Source-only from 1.0.1 — no longer published to Maven Central; build from source or use a private repository* |
 
 ```xml
 <dependency>
     <groupId>io.github.oatelauser</groupId>
-    <artifactId>spring-plus-web</artifactId>
+    <artifactId>spring-plus-web-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -45,11 +45,11 @@ Boot applications get everything auto-configured — see [examples/spring-boot-w
 
 | 模块 | 定位 | 依赖 |
 |---|---|---|
-| [`spring-plus-boot`](./spring-plus-boot/README.md) | 家族基础模块 + Spring Boot 生态能力拓展：通用工具（反射/容器/资源/日志脱敏/TLS）、HTTP 客户端（拦截器链/重试/GZIP/指标）、配置文件加密、优雅停机 | 无内部依赖 |
-| [`spring-plus-web`](./spring-plus-web/README.md) | Spring Web 层能力拓展：统一响应（SimpleResponse / 状态码体系）、全局异常体系（JSON/SSE/NDJSON，模块级 advice 优先、全局兜底）、流式响应写入器、分页四件套、校验注解、请求追踪、运行时断言 | boot |
-| [`spring-plus-redis`](./spring-plus-redis/README.md) | Redis 能力域：`RedisStringOperation`（Lua 批量读删/原子自增过期/通配护栏）、Jackson 化 `jacksonRedisTemplate`、缓存工具 | 无内部依赖 |
-| [`spring-plus-governor`](./spring-plus-governor/README.md) | 服务治理：幂等提交 / 防重复提交（AOP 织入，Redis / 内存双存储）；限流熔断未来归此 | web |
-| [`spring-plus-security`](./spring-plus-security/README.md) | 声明式鉴权：`@RequiresRole` / `@RequiresPermission` / `@Authorize` 等注解替代 SpEL；模块级异常 advice（denied 透传 + 认证异常映射错误码） | web、boot |
+| [`spring-plus-boot-starter`](./spring-plus-boot-starter/README.md) | 家族基础模块 + Spring Boot 生态能力拓展：通用工具（反射/容器/资源/日志脱敏/TLS）、HTTP 客户端（拦截器链/重试/GZIP/指标）、配置文件加密、优雅停机 | 无内部依赖 |
+| [`spring-plus-web-starter`](./spring-plus-web-starter/README.md) | Spring Web 层能力拓展：统一响应（SimpleResponse / 状态码体系）、全局异常体系（JSON/SSE/NDJSON，模块级 advice 优先、全局兜底）、流式响应写入器、分页四件套、校验注解、请求追踪、运行时断言 | boot |
+| [`spring-plus-redis-starter`](./spring-plus-redis-starter/README.md) | Redis 能力域：`RedisStringOperation`（Lua 批量读删/原子自增过期/通配护栏）、Jackson 化 `jacksonRedisTemplate`、缓存工具 | 无内部依赖 |
+| [`spring-plus-governor-starter`](./spring-plus-governor-starter/README.md) | 服务治理：幂等提交 / 防重复提交（AOP 织入，Redis / 内存双存储）；限流熔断未来归此 | web |
+| [`spring-plus-security-starter`](./spring-plus-security-starter/README.md) | 声明式鉴权：`@RequiresRole` / `@RequiresPermission` / `@Authorize` 等注解替代 SpEL；模块级异常 advice（denied 透传 + 认证异常映射错误码） | web、boot |
 | [`spring-plus-calcite-memory`](./spring-plus-calcite-memory/README.md) | 内存 SQL 查询：POJO/Map/List 注册为内存表，Apache Calcite 驱动 SQL 查询（**自 1.0.1 起不再发布 Central**，源码保留，需源码/私仓引入） | 无内部依赖（独立） |
 | [`examples/spring-boot-web-example`](./examples/spring-boot-web-example) | Spring Boot 接入示例：21 个端点覆盖异常体系全部验收用例 + 流式响应四件套 + 幂等 | web + boot + governor |
 
@@ -60,7 +60,7 @@ Boot applications get everything auto-configured — see [examples/spring-boot-w
 ```xml
 <dependency>
     <groupId>io.github.oatelauser</groupId>
-    <artifactId>spring-plus-web</artifactId>
+    <artifactId>spring-plus-web-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -143,7 +143,7 @@ advice 段位约定：
 | 0~900 | 框架模块与业务模块（security = 100） |
 | `LOWEST_PRECEDENCE` | 全局兜底 `GlobalExceptionAdvice`（专属） |
 
-首个落地用例：`spring-plus-security` 的 `SecurityExceptionAdvice`（`@Order(100)`）——`AccessDeniedException` 家族透传给 `ExceptionTranslationFilter`（403 语义保留）；认证异常家族按子类型映射 `ClientStatus` 错误码（A0210/A0202/A0203/A0212/A0213/A0230/A0301）统一渲染为 401。
+首个落地用例：`spring-plus-security-starter` 的 `SecurityExceptionAdvice`（`@Order(100)`）——`AccessDeniedException` 家族透传给 `ExceptionTranslationFilter`（403 语义保留）；认证异常家族按子类型映射 `ClientStatus` 错误码（A0210/A0202/A0203/A0212/A0213/A0230/A0301）统一渲染为 401。
 
 ## 给 AI 的 skills
 

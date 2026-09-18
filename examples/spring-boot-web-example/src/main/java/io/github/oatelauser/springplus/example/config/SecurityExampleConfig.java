@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 /**
  * 安全基线示例（V08 红线的对照样例）。
  * <p>
- * <b>红线：spring-plus-security 只做授权（注解声明），认证与 FilterChain 必须由业务方自配，
+ * <b>红线：spring-plus-security-starter 只做授权（注解声明），认证与 FilterChain 必须由业务方自配，
  * 且默认方向 denyAll——放行走白名单。</b>未配置本类的应用所有接口裸奔。
  * <p>
  * 演示账号（仅示例，内存态）：

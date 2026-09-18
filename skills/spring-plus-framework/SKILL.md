@@ -11,10 +11,10 @@ description: 在已引入 spring-plus-framework（io.github.oatelauser:spring-pl
 
 处理任何涉及本框架的任务时，按涉及模块同时加载对应子 skill（位于本仓库 `skills/` 目录）：
 
-- `spring-plus-web` —— 统一响应 / 异常 / 流式 / 校验 / 断言（几乎所有任务都要加载）
-- `spring-plus-boot` —— HTTP 客户端 / Redis 工具 / 配置加密 / 优雅停机
-- `spring-plus-governor` —— 幂等 / 防重复提交
-- `spring-plus-security` —— 注解式鉴权
+- `spring-plus-web-starter` —— 统一响应 / 异常 / 流式 / 校验 / 断言（几乎所有任务都要加载）
+- `spring-plus-boot-starter` —— HTTP 客户端 / Redis 工具 / 配置加密 / 优雅停机
+- `spring-plus-governor-starter` —— 幂等 / 防重复提交
+- `spring-plus-security-starter` —— 注解式鉴权
 - `spring-plus-calcite-memory` —— 内存 SQL 查询
 
 不确定涉及哪个模块时，全部加载 web 子 skill，其余按 import 出现与否判断。

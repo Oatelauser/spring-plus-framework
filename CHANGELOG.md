@@ -12,12 +12,13 @@
 - `ClientStatus` 新增 `A0212`（用户密码已过期）/ `A0213`（用户账户已过期）
 - web 删除 `SECURITY_DENIED_CLASSES` 按类名透传的妥协（denied 让路由由 security 模块 advice 类型安全接管）
 
-### ⚠️ 模块重组（破坏性，[ADR 0003](./docs/adr/0003-boot-as-base-redis-split.md)）
+### ⚠️ 模块重组（破坏性，[ADR 0003](./docs/adr/0003-boot-as-base-redis-split.md) / [ADR 0004](./docs/adr/0004-starter-naming.md)）
 
-- **依赖倒置**：`spring-plus-boot` 不再依赖 `spring-plus-web`，改为 `web → boot`、`security → boot`（governor 经 web 传递）——boot 成为家族基础模块；仅需配置加密/优雅停机的应用不再被迫传递引入 web
+- **全家族 starter 化重命名**：5 个发布模块坐标统一加 `-starter` 后缀——`spring-plus-boot` → `spring-plus-boot-starter`，`spring-plus-web` / `spring-plus-redis` / `spring-plus-governor` / `spring-plus-security` 同理；模块目录与 skills/ 技能目录随坐标同步改名。Java 包名、自动装配机制、依赖结构均不变；旧坐标不设迁移桥，直接不兼容替换（`spring-plus-calcite-memory` 不参与，见 ADR 0004 冻结说明）
+- **依赖倒置**：`spring-plus-boot-starter` 不再依赖 `spring-plus-web-starter`，改为 `web → boot`、`security → boot`（governor 经 web 传递）——boot 成为家族基础模块；仅需配置加密/优雅停机的应用不再被迫传递引入 web
 - **utils 包迁移**：`AnnotationUtils` / `ApplicationContextHolder` / `ApplicationContextUtils` / `BeanUtils` / `FileResources` / `InsecureTlsHelper` / `LogSanitizer` 由 `io.github.oatelauser.springplus.web.utils` 迁至 `io.github.oatelauser.springplus.boot.utils`（业务 import 需改；`AssertUtils`、`JsonUtils` 留守 web）；`spring.factories` 的 `ApplicationContextInitializer` 注册随迁 boot
-- **Redis 独立成模块**：新坐标 `spring-plus-redis`——`RedisStringOperation` / `CacheUtils` / `KeyValue` + Lua 脚本 + 自动配置，包名 `springplus.boot.redis` → `springplus.redis`；boot 不再传递 Redis 工具，使用方坐标替换
-- **Jackson 化 RedisTemplate**（`spring-plus-redis`）：新增 `jacksonRedisTemplate` Bean（`RedisTemplate<String, Object>`，按名注入、不接管 Boot 默认）——JSON 内嵌 `@class`（Object 值 round-trip 安全）、容器 `JsonMapper` 取副本配置不被 default typing 污染、String key + Jackson value 一把装配；classpath 无 Jackson 时整体退避
+- **Redis 独立成模块**：最终坐标 `spring-plus-redis-starter`（ADR 0003 拆分时定名 `spring-plus-redis`，随 ADR 0004 重命名）——`RedisStringOperation` / `CacheUtils` / `KeyValue` + Lua 脚本 + 自动配置，包名 `springplus.boot.redis` → `springplus.redis`；boot 不再传递 Redis 工具，使用方坐标替换
+- **Jackson 化 RedisTemplate**（`spring-plus-redis-starter`）：新增 `jacksonRedisTemplate` Bean（`RedisTemplate<String, Object>`，按名注入、不接管 Boot 默认）——JSON 内嵌 `@class`（Object 值 round-trip 安全）、容器 `JsonMapper` 取副本配置不被 default typing 污染、String key + Jackson value 一把装配；classpath 无 Jackson 时整体退避
 
 ### 安全增强
 

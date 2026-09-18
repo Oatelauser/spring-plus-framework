@@ -3,7 +3,7 @@ server:
 
 spring:
   jackson:
-    # 以下 4 键由 spring-plus-web 的 JacksonConfiguration 读取：
+    # 以下 4 键由 spring-plus-web-starter 的 JacksonConfiguration 读取：
     #   time-zone / date-format 与 Spring Boot 官方同名同义；
     #   datetime-format / time-format 为框架扩展键（官方无对应），默认值即下方所示
     time-zone: GMT+8
