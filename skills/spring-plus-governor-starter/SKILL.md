@@ -16,6 +16,25 @@ description: spring-plus-framework 的服务治理能力使用约定（坐标 io
 | @Idempotent / @RepeatSubmit 用法、窗口语义、SpEL 键表达式、releaseOnFailure | [references/idempotency.md](references/idempotency.md) |
 | 键策略选择与自定义（租户维度）、存储选择（Redis/内存）、容量上限、集群部署要求 | [references/storage-and-strategy.md](references/storage-and-strategy.md) |
 
+## 与手写幂等/防重的关系（使用规则总纲）
+
+本模块替代的是业务里手写的幂等/防重样板，接管"声明 → 织入 → 存储 → 拒绝渲染"全链路：
+
+| 手写惯用法 | 本模块写法 |
+|---|---|
+| Redis `SETNX` + `EXPIRE` 两步做防重（有原子性窗口漏洞） | `@Idempotent`（首次生效）或 `@RepeatSubmit`（重复直接拒绝），存储与原子性由模块负责 |
+| 自写 `HandlerInterceptor` / MVC 拦截器防重复提交 | 一个注解；编程式 AOP 对**任意 Spring Bean 方法**生效（Service 层也可），不限于 Controller |
+| 手拼幂等 key（`userId + ":" + 参数 JSON 哈希`） | 键策略：默认参数指纹（`FingerprintKeyStrategy`）；`express`/`spel` 取业务键；多租户自定义策略类 |
+| 手写"业务失败后允许重试"开关逻辑 | `@RepeatSubmit(releaseOnFailure = false)` |
+| 手写 `ConcurrentHashMap` 内存防重（集群失效/无界增长） | `InMemoryIdempotentStore`（10 万容量护栏、满载 fail-closed）；集群自动切 `RedisIdempotentStore` |
+| 防重命中后自己构造"请勿重复提交"响应 | 拒绝时抛 `ServiceException`（REPEAT_SUBMIT 语义），由 web 异常体系渲染 |
+
+以下**不在**本模块（别往这找，也别手写）：
+
+- 限流 / 熔断：模块规划中，当前用 Resilience4j 或网关层能力
+- 分布式锁：时间窗幂等 ≠ 锁；锁语义用 Redisson（见 redis-starter 选型指路）
+- 验证码 / 风控防爬：Web 层或网关层职责
+
 ## 核心决策规则
 
 1. "同一操作在时间窗内只算一次"（创建订单、发起支付）→ `@Idempotent`（默认窗口 60s）

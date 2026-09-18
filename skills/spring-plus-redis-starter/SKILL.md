@@ -16,6 +16,20 @@ description: spring-plus-framework 的 Redis 能力域使用约定（坐标 io.g
 | RedisStringOperation 全 API、批量护栏规则、CacheUtils/KeyValue 命名约定 | [references/string-operations.md](references/string-operations.md) |
 | jacksonRedisTemplate 装配、JSON 内嵌 @class、PolymorphicTypeValidator 安全红线 | [references/jackson-template.md](references/jackson-template.md) |
 
+## 与 Spring Data Redis / 手写样板的关系（使用规则总纲）
+
+本模块**不替换** Spring Data Redis——`RedisTemplate` / `StringRedisTemplate` 的全部官方 API 照常用；本模块只替代四类高频手写样板：
+
+| 手写惯用法 | 本模块写法 |
+|---|---|
+| 网上复制粘贴的 Jackson `RedisTemplate` 配置段（易错三连：忘嵌类型/污染容器 mapper/拼装漏配） | 按名注入 `jacksonRedisTemplate`（`@class` 内嵌 round-trip 安全、容器 JsonMapper 取副本不被污染、一把装配） |
+| 手写 `SCAN` 循环批量读/删（全库通配风险） | `batchGet(pattern)` / `batchDelete(pattern)`——护栏强制实质前缀、1000 条上限 |
+| 两步 `increment` + `expire`（非原子，宕机留死键） | `incrementExpire(key, 秒)` Lua 原子 |
+| 散拼 key 前缀字符串常量 | `KeyValue` 枚举集中声明 + `CacheUtils.getCacheKey(...)` |
+| 想自己写分布式锁/延迟队列/限流 | **不做**——见下方选型指路表，直接用成熟方案 |
+
+照常用边界：本模块 Bean 均带 `@ConditionalOnMissingBean`，同名 Bean 可整体替换；不引入 `spring-data-redis` 传递依赖（provided），由使用方按需引入。
+
 ## 选型指路（不重复造轮子红线）
 
 | 需求 | 用什么 |

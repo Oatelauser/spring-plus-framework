@@ -17,6 +17,33 @@ description: spring-plus-framework 的声明式鉴权能力使用约定（坐标
 | 对接权限数据源：实现 Authorizer SPI、@Authorize 指定、超管短路机制 | [references/authorizer.md](references/authorizer.md) |
 | SecurityFilterChain 基线、白名单匹配器、401/403 渲染（SecurityExceptionAdvice） | [references/filter-chain-and-advice.md](references/filter-chain-and-advice.md) |
 
+## 与原生 Spring Security 的关系（使用规则总纲）
+
+本模块**不替换** Spring Security，只替换"授权声明与安全错误渲染"的表达方式。三个接管域：
+
+1. **授权注解声明**：`@Requires*` 族替代 `@PreAuthorize` SpEL——拦截器由模块自动装配（`AuthorizationManagerBeforeMethodInterceptor` / `AfterMethodInterceptor`），**无须业务侧 `@EnableMethodSecurity`**
+2. **认证/授权异常渲染**：401/403 错误体由 `SecurityExceptionAdvice` 接管（认证异常映射 A02xx/A0301，denied 透传给 Security 翻译 403）
+3. **白名单路径收集**：`@RequiresNonLogin` 端点由 `AnonymousRequestMatcher` 自动收集
+
+原生惯用法 → 本模块写法对照：
+
+| 原生 Spring Security 惯用法 | 本模块写法 |
+|---|---|
+| `@PreAuthorize("hasRole('ADMIN')")` | `@RequiresRole(role = "ADMIN")`；超管端点 `@RequiresAdminRole` |
+| `@PreAuthorize("@ss.hasPermission('user','delete')")` | `@RequiresPermission(source = "user", action = "delete")`（权限键 `user:delete`） |
+| `@PostAuthorize("...")` | `@PostAuthorize(beanClass = XxxAuthorizer.class)` 指定自定义授权器 |
+| `SecurityContextHolder.getContext().getAuthentication()` 手取主体 | `@Principal` 注入 Controller 方法参数 |
+| 手写 `AuthenticationEntryPoint` / `AccessDeniedHandler` 渲染错误 JSON | 已由 `SecurityExceptionAdvice` 接管，不要重复配（要改文案走 web 异常映射体系） |
+| 大片 `permitAll()` 白名单 | 显式白名单 + `@RequiresNonLogin` 收集；**基线方向不变：默认 denyAll** |
+| 权限数据在库/远程服务 | 实现 `Authorizer` / `AnnotationAuthorizer` 注册为 Bean（默认 `GrantedAuthorityAuthorizer` 读 authorities） |
+
+以下照常自配，本模块**不做认证**：
+
+- `SecurityFilterChain` / `HttpSecurity`、`UserDetailsService`、`PasswordEncoder`
+- 登录 / token 解析 / 会话 / JWT / OAuth2 等认证链路全套
+- CSRF / CORS / 会话管理等其余 Security 能力
+- 若因其他原生注解开启了 `@EnableMethodSecurity`：与模块拦截器共存，但**同一方法不要两套注解重复声明**
+
 ## 安全红线（最高优先级，先于一切规则）
 
 1. **必须自配 `SecurityFilterChain` 且默认 `denyAll`，放行走显式白名单**——本模块不替你关大门；没配 FilterChain 的应用所有接口裸奔（贴几个注解 ≠ 安全）

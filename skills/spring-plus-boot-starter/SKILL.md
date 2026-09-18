@@ -18,6 +18,26 @@ description: spring-plus-framework 家族基础模块使用约定（坐标 io.gi
 | 优雅停机：StartupProcess 启动序、ShutdownHook 停机序 | [references/lifecycle.md](references/lifecycle.md) |
 | boot.utils 通用工具逐类速查（含 LogSanitizer 敏感键掩码） | [references/utils.md](references/utils.md) |
 
+## 与原生 Spring Boot 的关系（使用规则总纲）
+
+本模块**不替换**任何 Boot 机制，提供四个工具域（HTTP 客户端门面 / 配置加密 / 启停编排 / 通用工具），替代的是各自的手写惯用法：
+
+| 手写惯用法 | 本模块写法 |
+|---|---|
+| 裸用 `RestClient`/`RestTemplate` 调下游 + 自己加重试/日志/指标 | `ApiClient`：单下游配 `spring-plus.client.base-url` 即得默认 Bean；拦截器链/重试/GZIP/`api.client.requests` 指标开箱 |
+| 手写拦截器给每个请求加 token/签名 header | 实现 `AuthProvider` 注册为 Bean，一处注入处处生效 |
+| jasypt / 手写属性后处理解密敏感配置 | `ENC(密文)` + `ConfigEncryptor` 命令行生成密钥密文（解密在 EnvironmentPostProcessor 阶段，早于一切 Bean） |
+| `ApplicationRunner`/`CommandLineRunner` 里做缓存预热 | `StartupProcess`（`start()` 在 **Web 容器接受请求前**执行；Runner 是启动后——按语义选，别混用） |
+| `Runtime.addShutdownHook` / `@PreDestroy` 里关资源 | 实现 `ShutdownHook` Bean（phase 机制保证 Web 容器摘流量后才执行，升序、异常不中断） |
+| 手写静态 `ApplicationContextHolder` / 反射工具 / 资源加载 / 日志脱敏 | `boot.utils` 现成：`ApplicationContextHolder` / `AnnotationUtils` / `FileResources` / `LogSanitizer` 等 |
+| 自建 Spring 容器工具（按泛型找 Bean、Ordered 排序收集） | `BeanUtils.getBeanOfGenerics` / `BeanUtils.sort(...)` |
+
+以下照常用，本模块不接管：
+
+- Boot 官方配置与机制（Actuator、profiles、`spring.http.client.*` 等官方键）不受影响
+- `spring-boot-starter-web`/`webmvc` 等官方 starter 照常引入；ApiClient 基于 Boot http-client 抽象，httpclient5 为 provided 可选引擎（缺席自动降级 JDK 实现）
+- 不需要的能力不必引入：本模块 Bean 均带条件装配（如不配 `base-url` 不装配默认客户端）
+
 ## 核心决策规则
 
 1. 单一下游服务：配 `spring-plus.client.base-url` 即得默认 `ApiClient` Bean（缺省不装配）
