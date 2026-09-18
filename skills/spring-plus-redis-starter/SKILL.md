@@ -1,46 +1,45 @@
 ---
 name: spring-plus-redis-starter
-description: 在已引入 io.github.oatelauser:spring-plus-redis-starter 的项目中进行 Redis 字符串原子操作（自增+过期 / Lua 批量读删）或缓存工具相关代码的编写或排障时优先使用。本 skill 定义 RedisStringOperation / CacheUtils 的使用约定与批量通配护栏。
+description: spring-plus-framework 的 Redis 能力域使用约定（坐标 io.github.oatelauser:spring-plus-redis-starter）。覆盖：RedisStringOperation（incrementExpire 自增+过期原子操作、Lua 批量读/删、batchGet/batchDelete 通配护栏防全库 SCAN）、CacheUtils/KeyValue key 命名约定、jacksonRedisTemplate（RedisTemplate<String,Object> JSON 序列化，@class 内嵌类型信息防 ClassCastException）。模块定位小而精，不是 Redisson 替代品——分布式锁/延迟队列/限流不在版图内（选型指路：Redisson/Redisson RRateLimiter/MQ）。写 Redis 工具类、配 Jackson 序列化模板、排查批量删除被拒/读回 LinkedHashMap 报错时使用。
 ---
 
 # spring-plus-redis-starter
 
-这个 skill 直接给 AI 使用。
+这个 skill 直接给 AI 使用。本文件是导航与全局规则；API 细节与示例在 `references/`。
 
-## 前置假设
+**模块定位：小而精，不是 Redisson 替代品。** 只做四件事：批量护栏（防全库 SCAN/删除）、Lua 原子操作门面、key 命名约定、Jackson 化 RedisTemplate（Boot 不提供的生态最普遍手写样板）。薄是特性，护栏是灵魂。
 
-- 项目已引入 `io.github.oatelauser:spring-plus-redis-starter`（无内部依赖；`spring-data-redis` 为 provided，容器存在 `StringRedisTemplate` 时自动装配）
+## 按需加载参考文档
 
-## 模块定位
+| 任务涉及 | 加载 |
+|---|---|
+| RedisStringOperation 全 API、批量护栏规则、CacheUtils/KeyValue 命名约定 | [references/string-operations.md](references/string-operations.md) |
+| jacksonRedisTemplate 装配、JSON 内嵌 @class、PolymorphicTypeValidator 安全红线 | [references/jackson-template.md](references/jackson-template.md) |
 
-Redis 能力域（ADR 0003 自 boot 拆出）：`StringRedisTemplate` 增强——Lua 脚本原子操作、批量读删护栏、缓存工具。1.1.0 前位于 `spring-plus-boot-starter` 的 `boot.redis` 包，已迁移。
+## 选型指路（不重复造轮子红线）
 
-**小而精是刻意设计**：本模块只做"护栏 + 原子门面 + key 命名约定"，**不是 Redisson 替代品**。
+| 需求 | 用什么 |
+|---|---|
+| 分布式锁 | Redisson `RLock`（token 比对释放 / 看门狗续期） |
+| 限流 | Redisson `RRateLimiter` 或网关层 |
+| 延迟队列 | Redisson `RDelayedQueue` 或真 MQ |
+| 消息（Stream/Pub-Sub） | Spring Data Redis `StreamMessageListenerContainer` 或 MQ |
+| 分布式 ID | 雪花/Leaf/号段；小场景拿 `incrementExpire` 自拼日期段 |
 
-## 不要这样做
+**给本模块加新功能的立项门槛**（三条同时满足）：Redisson 与 Spring 都没有该能力 + 手写必错（原子性/一致性陷阱）+ 本模块有护栏视角的增量。
 
-- **不要在本模块或业务代码里重复实现成熟方案**（选型指路）：分布式锁 → Redisson `RLock`；限流 → `RRateLimiter` 或网关层；延迟队列 → Redisson `RDelayedQueue` 或 MQ；消息 → Spring `StreamMessageListenerContainer` 或 MQ；分布式 ID → 雪花 / Leaf / 号段
-- 不要在业务代码里直接操作 `StringRedisTemplate` 完成本模块已封装的原子操作
-- 不要手写 Jackson 化 RedisTemplate 配置类（类型内嵌遗漏/mapper 污染两类坑，用 `jacksonRedisTemplate`）；Redis 可被不可信方写入时必须收紧 `PolymorphicTypeValidator`
-- 批量 pattern 禁止拼接外部输入；护栏拒绝的纯通配不要绕过
-- 给本模块加新功能须同时满足三条：Redisson/Spring 都没有 + 手写必错 + 有护栏视角增量，否则不立项
+## 红线
 
-## 优先复用的公开类型
+- 批量 pattern（`batchGet`/`batchDelete`）**必须含实质前缀**（首个 `*` 前有字母数字，如 `user:*`）——纯通配（`*`/`*:*`）直接拒绝；护栏拒绝的不要绕
+- pattern **禁止拼接外部输入**
+- Redis 可被不可信方写入时，必须用 `RedisJacksonTemplates.jacksonValueSerializer(...)` 自行收紧 `PolymorphicTypeValidator`——无约束多态反序列化面对不可信数据是任意代码执行风险（见 jackson-template.md）
+- 本模块坐标替换原 `spring-plus-boot-starter` 传递的 Redis 工具（ADR 0003 拆分，包名 `springplus.boot.redis` → `springplus.redis`）
 
-Redis 工具（`io.github.oatelauser.springplus.redis`）：
+## 已知陷阱
 
-- `RedisStringOperation`（`incrementAndExpire` 自增+过期原子 / `batchGet` / `batchDelete`，Lua 驱动）
-- `CacheUtils` / `KeyValue`
-- `jacksonRedisTemplate` Bean（`RedisTemplate<String, Object>`，按名注入）与工厂 `RedisJacksonTemplates`：JSON 内嵌 `@class` 的对象缓存通道，容器 `JsonMapper` 取副本不被污染
+- `spring-data-redis` 是 **provided**：容器存在 `StringRedisTemplate` Bean 时才自动装配 `RedisStringOperation`，缺席时整体退避（启动不报错，注入处才见分晓）
+- `batchGet` 单次返回上限默认 **1000** 条（`setMaxBatchGetResults` 可调），超限 fail-fast——提示收紧 pattern，不是调大上限
 
-## 决策规则
+## 文档同步约定
 
-1. 字符串原子操作（自增+过期等）一律用 `RedisStringOperation`，不要手写 Lua
-2. 批量读删的 pattern 必须含实质前缀（如 `user:*`）；纯通配被护栏拒绝
-3. 需要替换默认行为时注册同名 `RedisStringOperation` Bean（`@ConditionalOnMissingBean` 退避）
-4. 对象缓存（存取 POJO）用 `jacksonRedisTemplate` 按名注入，不要手写 Jackson 序列化模板配置；跨语言/省体积走 `StringRedisTemplate` + `RedisStringOperation`
-
-## 已知注意事项
-
-- `batchGet` 单次上限默认 1000 条（`setMaxBatchGetResults` 可调），超限 fail-fast
-- 未引入 spring-data-redis 的项目自动配置整体退避，不会报错
+本 skill 的 API 断言以模块源码为唯一基准；模块行为变更时，模块 README 与本 skill（SKILL.md 及 references/）必须同步修改——只改一边视为未完成。

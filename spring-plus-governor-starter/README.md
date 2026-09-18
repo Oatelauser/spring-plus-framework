@@ -30,7 +30,7 @@
 @PostMapping("/order/create")
 public SimpleResponse<Void> create(@Valid @RequestBody CreateOrderCmd cmd) { ... }
 
-@RepeatSubmit(interval = 5, timeUnit = TimeUnit.SECONDS)
+@RepeatSubmit(window = 5, unit = TimeUnit.SECONDS)
 @PostMapping("/pay")
 public SimpleResponse<Void> pay(@Valid @RequestBody PayCmd cmd) { ... }
 ```

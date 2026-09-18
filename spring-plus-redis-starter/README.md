@@ -24,7 +24,7 @@ Redis 能力域独立模块（ADR 0003，自 `spring-plus-boot-starter` 拆出�
 
 | 能力 | 入口 |
 |---|---|
-| String 原子操作 | `RedisStringOperation`：`incrementAndExpire`（自增+过期原子）、Lua 批量读 / 删 |
+| String 原子操作 | `RedisStringOperation`：`incrementExpire`（自增+过期原子）、Lua 批量读 / 删 |
 | 缓存工具 | `CacheUtils` / `KeyValue` |
 | Jackson 化模板 | `jacksonRedisTemplate` Bean（`RedisTemplate<String, Object>`）/ `RedisJacksonTemplates` 工厂 |
 
@@ -46,7 +46,7 @@ Redis 能力域独立模块（ADR 0003，自 `spring-plus-boot-starter` 拆出�
 - `batchGet` 单次返回上限默认 **1000** 条（`setMaxBatchGetResults` 可调），超限 fail-fast 提示收紧 pattern
 
 ```java
-redisStringOperation.incrementAndExpire("counter:login:" + userId, Duration.ofMinutes(30));
+redisStringOperation.incrementExpire("counter:login:" + userId, 1800);   // 秒
 ```
 
 附带 3 个 Lua 脚本（`bdel` / `bget` / `expire_increment`）保证原子性。

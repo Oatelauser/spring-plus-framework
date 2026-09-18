@@ -55,3 +55,7 @@ description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.git
 - `spring.jackson.datetime-format`/`time-format`/`long-to-string` 是框架扩展键，Boot 官方文档查不到；`long-to-string` 默认关（`references/json-and-assert.md`）
 - 模块 advice 声明 `Exception`/`Throwable` 兜底或无显式 `@Order` 会被启动期 `ModuleAdviceContractValidator` 告警（`references/exception-handling.md`）
 - 敏感键日志掩码只覆盖 `LogSanitizer` 默认键集，自定义业务敏感字段需评估扩展（`boot-starter` 的 utils）
+
+## 文档同步约定
+
+本 skill 的 API 断言以模块源码为唯一基准；模块行为变更时，模块 README 与本 skill（SKILL.md 及 references/）必须同步修改——只改一边视为未完成。

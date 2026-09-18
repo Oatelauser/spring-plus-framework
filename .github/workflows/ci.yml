@@ -19,6 +19,9 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Validate skills structure
+        run: python scripts/validate_skills.py
+
       - name: Build and test
         run: mvn -B clean install
 

@@ -32,3 +32,7 @@ description: spring-plus-framework 家族基础模块使用约定（坐标 io.gi
 - `spring-plus.client.ssl.allow-insecure`（信任所有证书）仅限内网调试，生产禁用
 - `InsecureTlsHelper` 已 `@Deprecated`：仅测试联调，业务代码禁止直接引用（生产使用视同漏洞）
 - `ShutdownHook` 不注册为普通 `@PostConstruct` 逻辑（停机顺序由 handler 保证，见 lifecycle.md）
+
+## 文档同步约定
+
+本 skill 的 API 断言以模块源码为唯一基准；模块行为变更时，模块 README 与本 skill（SKILL.md 及 references/）必须同步修改——只改一边视为未完成。

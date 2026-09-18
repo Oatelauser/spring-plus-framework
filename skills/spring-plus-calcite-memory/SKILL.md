@@ -1,6 +1,6 @@
 ---
 name: spring-plus-calcite-memory
-description: 在已引入 io.github.oatelauser:spring-plus-calcite-memory 的项目中处理内存数据 SQL 筛选、规则过滤、内存报表、临时数据集查询场景时优先使用。本 skill 定义 @MemoryTable 注解族、MemoryQueryEngine/Session 的会话管理、SQL 白名单与资源限额的约束，以及 MyBatis/JDBC 可选集成的启用条件。
+description: spring-plus-calcite-memory（io.github.oatelauser）内存 SQL 查询能力使用约定：POJO/Map/List 经 @MemoryTable 注解族注册为内存表，Apache Calcite 驱动 SQL 查询（内存数据筛选、规则过滤、临时数据集报表）。覆盖 MemoryQueryEngine/Session 会话管理、SQL 白名单与资源限额、MyBatis/JDBC 可选集成条件。注意：本模块自 1.0.1 起不发布 Maven Central（源码引入），且已冻结待移除/迁移——优先考虑用 Stream/JDK 集合或数据库替代，仅在存量代码维护场景使用本 skill。
 ---
 
 # spring-plus-calcite-memory

@@ -38,3 +38,7 @@ description: spring-plus-framework 的声明式鉴权能力使用约定（坐标
 - 不把权限校验逻辑写进 Controller 方法体
 - 不在 `@RequiresPermission` 里留空 `source`/`action`
 - 已认证但无权限是 403、未认证是 401——排查时先分清这两类，别急着改注解（见 filter-chain-and-advice.md 渲染表）
+
+## 文档同步约定
+
+本 skill 的 API 断言以模块源码为唯一基准；模块行为变更时，模块 README 与本 skill（SKILL.md 及 references/）必须同步修改——只改一边视为未完成。
