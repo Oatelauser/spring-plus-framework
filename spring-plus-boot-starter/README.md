@@ -57,7 +57,7 @@ application.yml 中的敏感配置以 `ENC(密文)` 书写，`EncryptedPropertyE
 
 ## 优雅停机
 
-`WebServerPostProcessor` 在 Web 容器就绪前触发容器中所有 `StartupProcess`（接口在本模块 `boot.lifecycle` 包）；`SmartGracefulShutdownHandler` 在停机时逆序执行 `ShutdownHook`，先摘流量后关资源。
+`WebServerPostProcessor` 在 Web 容器接受请求前触发容器中所有 `StartupProcess`（接口在本模块 `boot.lifecycle` 包，方法 `start()`）；`SmartGracefulShutdownHandler`（SmartLifecycle，phase 低于 Web 容器）在 Web 容器优雅停机**之后**按 `Ordered` 升序执行 `ShutdownHook`——摘流量由容器 phase 机制先完成，业务 hook 只管关资源，单个 hook 异常记日志不中断。
 
 ## SSRF 防护（1.1.0+）
 

@@ -65,6 +65,7 @@
 
 ### 其他
 
+- **文档勘误**（代码即契约，以下文档表述已修正为与实现一致）：`Page` 总数字段 JSON 键为 `total`（此前 README/javadoc/CONTEXT 误写 `totalCount`，1.0.0 起实际序列化即为 `total`）；`PageResponse.ok` 参数序为 `(request, total, records)`；优雅停机 `ShutdownHook` 按 `Ordered` **升序**执行（此前 README 误写"逆序"，摘流量由 SmartLifecycle phase 机制保证）；`ApiClientSettings` 连接池配置前缀为 `apache-hc5.*`
 - **发布范围缩减**：`spring-plus-calcite-memory` 自本版本起不再发布到 Maven Central（根 POM `excludeArtifacts` 排除；模块保留在源码仓与 Reactor 中正常构建/测试，需要方请源码或私仓引入。1.0.0 已发布版本不受影响）
 - spring.factories 注册文件修复（web ApplicationContextInitializer 与 boot EnvironmentPostProcessor 的行续接损坏，此前实际未生效）
 - 新增安全回归测试 22 个（全仓 238 → 预计 245+）

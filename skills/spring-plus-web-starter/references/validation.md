@@ -44,7 +44,7 @@ public class ActivityCmd implements Validatable {
 
     @Override
     public ValidationResult validate() {
-        // 返回失败字段清单；通过返回 ValidationResult.ok()
+        // 通过返回 ValidationResult.success()；失败用 failure(...) 族（单字段/清单）
     }
 }
 ```
