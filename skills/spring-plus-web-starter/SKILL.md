@@ -19,6 +19,40 @@ description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.git
 
 只做小改动且明确知道规则时可不加载；涉及具体 API 用法/配置键/多协议输出时必须加载对应文件。
 
+## 与原生 Spring MVC 的关系（使用规则总纲）
+
+本模块**不替换** Spring MVC，而是在五个域上接管约定——这些域里不要再写裸 MVC 惯用法：
+
+1. **全局异常处理**（含 JSON/SSE/NDJSON 三协议错误渲染）
+2. **统一响应封装**（成功/失败响应体结构）
+3. **容器 JsonMapper 定制**（时间格式 / long-to-string 等全局序列化约定）
+4. **流式与 SSE 输出通道**（协议头/分块/错误补写）
+5. **校验失败的结构化错误输出**（violations 装配）
+
+裸 Spring MVC 惯用法 → 本框架写法对照：
+
+| 裸 MVC 惯用法 | 本框架写法 |
+|---|---|
+| 返回 `ResponseEntity<T>` / 裸 DTO / Map / `List<T>` | 一律 `SimpleResponse<T>` / `PageResponse<T>`（无数据 `SimpleResponse<Void>`） |
+| try/catch 后手工构造错误 JSON 返回 | 抛类型化异常（`ServiceException` 直通，或异常类上贴 `@JsonExceptionResponse` 族注解），让全局体系渲染 |
+| 自写 `@RestControllerAdvice` + `@ExceptionHandler(Exception.class)` 全局兜底 | **框架已自动装配 `GlobalExceptionAdvice` 兜底**；业务/模块 advice 只接管窄异常域 + 显式 `@Order`（0~900），不声明 Exception/Throwable 级兜底 |
+| `new ObjectMapper()` / 自建 JsonMapper 工具类 | `JsonUtils`（与容器实例同源，含全部全局定制） |
+| PageHelper / 自建 `PageResult` | 入参继承 `BasePageRequest`，返回 `PageResponse.ok(request, total, records)` |
+| 手写正则/hutool 校验手机号、枚举取值、集合元素 | `@Phone` / `@EnumValue(enumClass=...)` / `@ListValues({...})` / `@NoNullElement` / `@UniqueElement`（空值默认过，必填叠加 `@NotBlank`/`@NotNull`） |
+| `if (x == null) throw new BizException("...")` 样板 | `AssertUtils.notNull(x, BusinessStatus.DATA_NOT_EXIST)`（失败即 `ServiceException`） |
+| 手写 `SseEmitter` + 自己 completeWithError | C 档 `sseConnectionFactory.open(request, executor).execute(task)` 零样板；错误映射贴 `@SseExceptionResponse` |
+| 手动操作 `HttpServletResponse` 输出流（下载/分块/NDJSON） | `HttpWriterFactory` 四件套：`download(...)` / `chunk(...)` / `ndjson(...)` / `sse(...)` |
+| `@PreAuthorize("@ss.hasRole('x')")` SpEL 鉴权 | 归 security 模块：`@RequiresRole` / `@RequiresPermission`（加载 spring-plus-security-starter） |
+
+以下标准 MVC 用法**照常使用**，本模块不接管：
+
+- `@RestController` / `@RequestMapping` / `@PathVariable` / `@RequestBody` 等标准注解与 MVC 流程
+- `@Valid` 触发机制本身（框架只接管"校验失败的错误输出形态"）
+- `HandlerInterceptor` / `WebMvcConfigurer` 中与上述五域不冲突的定制
+- 文件上传、重定向、协商渲染等标准能力；确需自定义响应头/状态的特殊场景 `ResponseEntity` 仍可用（但**数据载荷默认仍是 SimpleResponse**）
+
+进阶：需要新的返回值语义时，注册 `HandlerMethodReturnValueHandler` Bean 即可——框架启动时自动收集装配进 `RequestMappingHandlerAdapter`。
+
 ## 能力归属（防找错模块）
 
 本模块：统一响应、状态码、分页、全局异常（JSON/SSE/NDJSON）、流式写入器、校验注解、请求追踪、AssertUtils、JsonUtils。
