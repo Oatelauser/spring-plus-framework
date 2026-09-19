@@ -9,10 +9,13 @@ import io.github.oatelauser.springplus.boot.lifecycle.ShutdownHook;
 import io.github.oatelauser.springplus.boot.lifecycle.SmartGracefulShutdownHandler;
 import io.github.oatelauser.springplus.boot.lifecycle.StartupProcess;
 import io.github.oatelauser.springplus.boot.lifecycle.WebServerPostProcessor;
+import io.github.oatelauser.springplus.boot.process.HandleBeanPostProcessor;
+import io.github.oatelauser.springplus.boot.process.HandleBeanPostProcessor.HandlerBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -47,6 +50,17 @@ public class SpringPlusBootAutoConfiguration {
     @ConditionalOnMissingBean
     public SmartGracefulShutdownHandler smartGracefulShutdownHandler(ObjectProvider<List<ShutdownHook>> shutdownHooks) {
         return new SmartGracefulShutdownHandler(shutdownHooks);
+    }
+
+    /**
+     * 启动期全量单例扫描设施：容器内所有 {@link HandlerBean} 在单例就绪后逐个处理 Bean
+     * （典型用途：security 模块的注解配置启动校验）。容器无任何 {@link HandlerBean} 时不装配。
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(HandlerBean.class)
+    public HandleBeanPostProcessor handleBeanPostProcessor(ObjectProvider<List<HandlerBean>> handlerBeans) {
+        return new HandleBeanPostProcessor(handlerBeans.getIfAvailable(List::of));
     }
 
     /**

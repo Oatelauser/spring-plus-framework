@@ -1,11 +1,9 @@
 package io.github.oatelauser.springplus.security.authorization;
 
+import io.github.oatelauser.springplus.boot.process.HandleBeanPostProcessor.HandlerBean;
 import io.github.oatelauser.springplus.security.annotation.RequiresAdminRole;
 import io.github.oatelauser.springplus.security.annotation.RequiresRole;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
@@ -31,7 +29,7 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
  * @since 1.0
  */
 @SuppressWarnings("unchecked")
-public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer implements ApplicationListener<ApplicationReadyEvent> {
+public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer implements HandlerBean {
 
     private final GrantedAuthorityDefaults authorityDefaults;
 
@@ -89,23 +87,21 @@ public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer implement
     }
 
     // ========================= 启动期校验（fail-closed / CWE-862） =========================
+    // 经 boot 的 HandleBeanPostProcessor 在单例就绪后全量扫描（实现 HandlerBean），
+    // supportsBean 用默认值（全部 Bean 都可能贴 @RequiresRole，无预筛维度）
 
     /**
      * 容器就绪后扫描全部 Bean 的 {@code @RequiresRole}（类级 + 方法级，含元注解归并）：
-     * {@code role = {}} 属"配了等于没配"的配置错误——启动期失败优于运行期静默放行/403 之谜。
+     * * {@code role = {}} 属"配了等于没配"的配置错误——启动期失败优于运行期静默放行/403 之谜。
      */
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        ConfigurableApplicationContext applicationContext = event.getApplicationContext();
-        for (String beanName : applicationContext.getBeanDefinitionNames()) {
-            Class<?> beanType = applicationContext.getType(beanName);
-            if (beanType != null) {
-                this.validateRequiresRole(beanType);
-            }
-        }
+    public void handleBean(Class<?> beanType, Object bean) {
+        this.validateRequiresRole(beanType);
     }
 
-    /** 校验单个类上的 {@code @RequiresRole}（类级 + 方法级），公开供测试直接调用 */
+    /**
+     * 校验单个类上的 {@code @RequiresRole}（类级 + 方法级），公开供测试直接调用
+     */
     public void validateRequiresRole(Class<?> beanType) {
         RequiresRole classLevel = findMergedAnnotation(beanType, RequiresRole.class);
         checkRole(beanType, null, classLevel);

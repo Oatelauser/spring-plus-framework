@@ -135,7 +135,7 @@
 - **危害**：`@RequiresRole(role = {})`、`permission = {}` 等“配了等于没配”的写法会被**放行所有已认证用户**；`@RequiresPermission` 留空要到第一次被调用才 500，生产发布前测不到即带病上线。授权体系的默认方向应该是 fail-closed。
 - **修复**：
   - 空 `requireAuthorities` 改为 `DENY`（或至少 warn＋DENY）；
-  - 增加启动期校验器（`SmartLifecycle`/`BeanPostProcessor` 扫描所有 `@RequiresPermission` 方法，空 source/action 直接启动失败，与 skill“运行期断言直接失败”收紧为“启动期失败”）；
+  - 增加启动期校验器（`SmartLifecycle`/`HandleBeanPostProcessor` 扫描所有 `@RequiresPermission` 方法，空 source/action 直接启动失败，与 skill“运行期断言直接失败”收紧为“启动期失败”）；
   - `CompositeAuthorizationManager`：pointcut 命中但零 authorizer 命中注解时返回 DENY＋error 日志（防御 pointcut 与注解解析未来漂移）。
 
 ### V08 🟠 security 模块“不管认证、无默认拒绝”——消费方极易裸奔上线
