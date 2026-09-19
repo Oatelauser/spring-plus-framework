@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.security.advice;
+package io.github.oatelauser.springplus.security.autoconfigure;
 
 import io.github.oatelauser.springplus.web.response.ClientStatus;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,5 @@
 package io.github.oatelauser.springplus.security.autoconfigure;
 
-import io.github.oatelauser.springplus.security.advice.SecurityExceptionAdvice;
 import io.github.oatelauser.springplus.security.authorization.*;
 import io.github.oatelauser.springplus.web.autoconfigure.ExceptionHandlingAutoConfiguration;
 import io.github.oatelauser.springplus.web.error.engine.ExceptionOutputEngine;
@@ -127,15 +126,13 @@ public class SpringPlusSecurityAutoConfiguration {
      * 保证引擎 Bean 定义先注册，条件求值确定）；非 Web 应用不引入任何 MVC 依赖。
      */
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     @ConditionalOnBean(ExceptionOutputEngine.class)
+    @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
     static class SecurityExceptionAdviceConfiguration {
-
         @Bean
         public SecurityExceptionAdvice securityExceptionAdvice(ExceptionOutputEngine outputEngine) {
             return new SecurityExceptionAdvice(outputEngine);
         }
-
     }
 
 }

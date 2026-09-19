@@ -1,6 +1,6 @@
 ---
 name: spring-plus-boot-starter
-description: spring-plus-framework 家族基础模块使用约定（坐标 io.github.oatelauser:spring-plus-boot-starter）。覆盖：ApiClient 声明式 HTTP 客户端（builder 多客户端、拦截器链、重试、GZIP、Micrometer api.client.requests 指标、AuthProvider 认证注入、SSRF 防护 spring-plus.client.ssrf.*）、ENC() 配置文件加密（ConfigEncryptor 命令行、ConfigCipher 密钥）、优雅停机（SmartGracefulShutdownHandler/ShutdownHook/StartupProcess）、boot.utils 通用工具（ApplicationContextHolder/ApplicationContextUtils/BeanUtils/AnnotationUtils/FileResources/LogSanitizer/ControllerAdviceScanUtils）。封装下游 HTTP 调用、加密数据库密码等敏感配置、处理启动/停机顺序、排查 ApiClient 超时重试与 SSRF 拦截问题时使用。统一响应/异常在 spring-plus-web-starter；Redis 工具在 spring-plus-redis-starter。
+description: spring-plus-framework 家族基础模块使用约定（坐标 io.github.oatelauser:spring-plus-boot-starter）。覆盖：ApiClient 声明式 HTTP 客户端（builder 多客户端、拦截器链、重试、GZIP、Micrometer api.client.requests 指标、AuthProvider 认证注入、SSRF 防护 spring-plus.client.ssrf.*）、ENC() 配置文件加密（ConfigEncryptor 命令行、ConfigCipher 密钥）、优雅停机（SmartGracefulShutdownHandler/ShutdownHook/StartupProcess）、boot.utils 通用工具（ApplicationContextHolder/ApplicationContextUtils/BeanUtils/AnnotationUtils/FileResources/LogSanitizer）。封装下游 HTTP 调用、加密数据库密码等敏感配置、处理启动/停机顺序、排查 ApiClient 超时重试与 SSRF 拦截问题时使用。统一响应/异常在 spring-plus-web-starter；Redis 工具在 spring-plus-redis-starter。
 ---
 
 # spring-plus-boot-starter

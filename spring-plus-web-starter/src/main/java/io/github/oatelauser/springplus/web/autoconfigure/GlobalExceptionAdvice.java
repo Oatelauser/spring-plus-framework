@@ -67,8 +67,8 @@ import java.util.concurrent.TimeoutException;
  * 兜底</b>。模块级 advice（如 spring-plus-security-starter 的透传 advice）声明更小的 order 即可优先
  * 接管——Spring 对多个 advice 按 order 排序后逐个咨询，第一个能匹配的 advice 直接赢，其余
  * （含本类）不再参与；未匹配任何模块 advice 的异常最终落回本类的具体 handler 与
- * {@code Exception.class} 兜底。模块段位约定 0~900（security = 100），契约违例由
- * {@code ModuleAdviceContractValidator} 启动期告警。
+ * {@code Exception.class} 兜底。模块段位约定 0~900（security = 100）；模块 advice 应只声明
+ * 窄异常类型并显式 {@code @Order}（声明 Exception/Throwable 兜底会遮蔽全局全部具体 handler）。
  *
  * @author <a href="mailto:545896770@qq.com">DearYang</a>
  * @date 2023-04-07

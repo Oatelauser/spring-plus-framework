@@ -67,7 +67,7 @@ description: spring-plus-framework 全家族使用约定的总入口（groupId i
 ## 验证闸门
 
 - 任何修改后跑最小验证：`mvn -pl <模块> compile`；涉及测试的改动跑对应测试类
-- 交付前跑 `mvn clean install`（全仓 286 个测试，约 20 秒）
+- 交付前跑 `mvn clean install`（全仓 281 个测试，约 20 秒）
 
 ## 交付检查清单
 

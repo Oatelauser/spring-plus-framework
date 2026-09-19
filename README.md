@@ -130,7 +130,7 @@ public SimpleResponse<Void> create(@Valid @RequestBody CreateUserCmd cmd) { ... 
 
 异常体系支持多 `@RestControllerAdvice` 共存：Spring 按 order 排序后逐个咨询，第一个能匹配的 advice 直接赢。`GlobalExceptionAdvice` 显式 `@Order(Ordered.LOWEST_PRECEDENCE)`，是全局兜底；模块/业务自带 advice 声明更小的 order 即可优先接管自己的异常域。
 
-契约（启动期由 `ModuleAdviceContractValidator` 告警校验）：
+契约（纯约定，无启动期校验，违例后果静默）：
 
 1. 模块 advice 只声明**窄异常类型**——`Exception`/`Throwable` 级兜底会遮蔽全局全部具体 handler（validation/DAO/请求解析等）；
 2. 模块 advice 必须显式 `@Order`——不标则与全局兜底平局，先后由 bean 注册顺序决定；

@@ -49,7 +49,7 @@ throw new ServiceException(BusinessStatus.DATA_NOT_EXIST)
 **advice 咨询顺序**（异常先到哪个 @RestControllerAdvice）：
 
 - 模块/业务 advice（显式 `@Order`，段位约定 0~900）> 全局 `GlobalExceptionAdvice`（`LOWEST_PRECEDENCE` 兜底）具体 handler > 其 `Exception.class` 兜底
-- 跨 advice 先到先得；`ModuleAdviceContractValidator` 启动期告警两类违例（仅告警不拦截）：非全局 advice 声明 `Exception`/`Throwable` 级兜底（会遮蔽全局全部具体 handler）、无显式 `@Order`
+- 跨 advice 先到先得；两类契约违例没有启动期校验、后果静默：非全局 advice 声明 `Exception`/`Throwable` 级兜底（遮蔽全局全部具体 handler）、无显式 `@Order`（与兜底平局，先后由注册顺序决定）——务必自查
 
 ## ExceptionMapper（P2 扩展点）
 

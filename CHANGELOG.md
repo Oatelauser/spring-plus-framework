@@ -7,7 +7,6 @@
 ### 模块级异常 advice 机制
 
 - **多 advice 共存**：`GlobalExceptionAdvice` 显式 `@Order(Ordered.LOWEST_PRECEDENCE)` 成为全局兜底；模块可自带 `@RestControllerAdvice`（`@Order` 更小即优先，段位约定 0~900）接管自身异常域，Spring 原生"按 order 逐个咨询、第一个匹配者赢"语义
-- **启动期契约校验**：新增 `ModuleAdviceContractValidator`（复用 boot `ControllerAdviceScanUtils` 扫描设施）——对非全局 advice 告警两类违例：声明 `Exception`/`Throwable` 级兜底（将遮蔽全局全部具体 handler）、无显式 `@Order`（与兜底平局、先后由注册顺序决定）；全部仅告警不拦截启动
 - **security 首个落地**：新增 `SecurityExceptionAdvice`（`@Order(100)`，SERVLET 应用且 web 错误引擎就位时自动装配）——`AccessDeniedException` 家族透传给 `ExceptionTranslationFilter`（403 语义保留）；认证异常家族按子类型映射 web 错误码（A0210/A0202/A0203/A0212/A0213/A0230/A0301）经 `ExceptionOutputEngine` 统一渲染为 401
 - `ClientStatus` 新增 `A0212`（用户密码已过期）/ `A0213`（用户账户已过期）
 - web 删除 `SECURITY_DENIED_CLASSES` 按类名透传的妥协（denied 让路由由 security 模块 advice 类型安全接管）

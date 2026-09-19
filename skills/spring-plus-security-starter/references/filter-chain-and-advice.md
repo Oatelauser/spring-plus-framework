@@ -31,7 +31,7 @@ public class SecurityConfig {
 
 ## 401/403 渲染（SecurityExceptionAdvice，1.1.0+）
 
-`SecurityExceptionAdvice`（`@RestController(Advice)` + `@Order(100)`）是模块级异常 advice 的首个落地：SERVLET 应用且 web 错误引擎就位时自动装配，先于全局 `GlobalExceptionAdvice` 被咨询。
+`SecurityExceptionAdvice`（位于 `security.autoconfigure` 包，`@RestControllerAdvice` + `@Order(100)`）是模块级异常 advice 的首个落地：SERVLET 应用且 web 错误引擎就位时自动装配，先于全局 `GlobalExceptionAdvice` 被咨询。
 
 **denied 透传**：`AccessDeniedException` 家族（含 `AuthorizationDeniedException`）原样 rethrow——403 语义交还 Security 的 `ExceptionTranslationFilter` 翻译。
 

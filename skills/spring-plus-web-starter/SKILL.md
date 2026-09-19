@@ -87,7 +87,7 @@ description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.git
 - `@Valid @RequestBody` 在 Spring 7 是 fail-fast，violations 只有单条；非 body 参数校验聚合全部结果（`references/validation.md`）
 - `@Phone`/`@EnumValue` 空值默认通过，必填须叠加 `@NotBlank`/`@NotNull`（`references/validation.md`）
 - `spring.jackson.datetime-format`/`time-format`/`long-to-string` 是框架扩展键，Boot 官方文档查不到；`long-to-string` 默认关（`references/json-and-assert.md`）
-- 模块 advice 声明 `Exception`/`Throwable` 兜底或无显式 `@Order` 会被启动期 `ModuleAdviceContractValidator` 告警（`references/exception-handling.md`）
+- 模块 advice 声明 `Exception`/`Throwable` 兜底会**静默遮蔽**全局全部具体 handler、无显式 `@Order` 时与兜底平局（先后由注册顺序决定）——纯约定，无启动期校验（`references/exception-handling.md`）
 - 敏感键日志掩码只覆盖 `LogSanitizer` 默认键集，自定义业务敏感字段需评估扩展（`boot-starter` 的 utils）
 
 ## 文档同步约定

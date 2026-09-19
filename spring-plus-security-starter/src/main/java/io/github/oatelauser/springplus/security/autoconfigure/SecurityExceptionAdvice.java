@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.security.advice;
+package io.github.oatelauser.springplus.security.autoconfigure;
 
 import io.github.oatelauser.springplus.web.error.descriptor.ErrorDescriptor;
 import io.github.oatelauser.springplus.web.error.engine.ExceptionOutputEngine;

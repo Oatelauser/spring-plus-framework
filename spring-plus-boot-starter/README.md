@@ -8,7 +8,7 @@
 
 | 能力 | 入口 |
 |---|---|
-| 通用工具 | `boot.utils`：`AnnotationUtils` / `BeanUtils` / `ApplicationContextHolder` / `ApplicationContextUtils` / `FileResources` / `LogSanitizer` / `InsecureTlsHelper`（@Deprecated）/ `ControllerAdviceScanUtils`（advice 扫描设施） |
+| 通用工具 | `boot.utils`：`AnnotationUtils` / `BeanUtils` / `ApplicationContextHolder` / `ApplicationContextUtils` / `FileResources` / `LogSanitizer` / `InsecureTlsHelper`（@Deprecated） |
 | HTTP 客户端 | `ApiClient` / `ApiClient.builder()`：拦截器链、重试、GZIP 压缩、认证注入、Micrometer 打点 |
 | 客户端适配 | `ClientHttpRequestFactoryProvider`（httpclient5 可选引擎）、`AuthProvider` 认证扩展点 |
 | 配置加密 | `ConfigCipher` / `ConfigEncryptor` / `EncryptedPropertyEnvironmentPostProcessor`（`ENC(...)` 密文自动解密） |

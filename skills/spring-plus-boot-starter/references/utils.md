@@ -54,18 +54,6 @@ boolean sens    = LogSanitizer.isSensitiveKey("password");
 
 默认敏感键集 `DEFAULT_SENSITIVE_KEYS`：`password` / `passwd` / `token` / `secret` / `authorization` / `phone` / `mobile` / `idcard`（大小写不敏感、子串命中）。BODY 级客户端日志与请求追踪旁录已自动接入；**新增业务敏感字段（如 `bankCard`）默认键集不会命中**——要么扩展键集，要么字段名对齐默认集。
 
-## ControllerAdviceScanUtils —— advice 扫描设施
-
-框架设施（供模块级启动校验复用），业务一般不直接用：
-
-```java
-List<AdviceBeanDescriptor> beans = ControllerAdviceScanUtils.findAdviceBeans(beanFactory);
-Set<Class<? extends Throwable>> handled = ControllerAdviceScanUtils.exceptionHandlerExceptionTypes(adviceType);
-boolean explicit = ControllerAdviceScanUtils.hasExplicitOrder(beanType);   // 是否显式 @Order
-```
-
-web 模块 `ModuleAdviceContractValidator` 的两类告警（Exception 兜底遮蔽 / 无显式 @Order）即基于此扫描。
-
 ## InsecureTlsHelper（@Deprecated）
 
 `trustAllContext()` / `trustAllSocketFactory()` / `trustAllManager()` / `allowAllVerifier()`。**仅测试联调可用，生产使用视同漏洞**；业务代码禁止直接引用——ApiClient 的 `ssl.allow-insecure` 是唯一受控入口。
