@@ -59,8 +59,8 @@ public class SpringPlusBootAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(HandlerBean.class)
-    public HandleBeanPostProcessor handleBeanPostProcessor(ObjectProvider<List<HandlerBean>> handlerBeans) {
-        return new HandleBeanPostProcessor(handlerBeans.getIfAvailable(List::of));
+    public HandleBeanPostProcessor handleBeanPostProcessor(List<HandlerBean> handlerBeans) {
+        return new HandleBeanPostProcessor(handlerBeans);
     }
 
     /**

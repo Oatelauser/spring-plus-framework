@@ -13,7 +13,7 @@
 | 客户端适配 | `ClientHttpRequestFactoryProvider`（httpclient5 可选引擎）、`AuthProvider` 认证扩展点 |
 | 配置加密 | `ConfigCipher` / `ConfigEncryptor` / `EncryptedPropertyEnvironmentPostProcessor`（`ENC(...)` 密文自动解密） |
 | 优雅停机 | `SmartGracefulShutdownHandler` / `ShutdownHook` / `WebServerPostProcessor` |
-| 启动期 Bean 扫描设施 | `HandleBeanPostProcessor` + `HandlerBean` SPI（单例就绪后全量扫描，fail-closed；security 的注解启动校验基于此） |
+| 启动期 Bean 扫描设施 | `HandleBeanPostProcessor` + `HandlerBean` SPI（单例就绪后扫描全部 Bean 定义：BeanKind 标注单例/懒加载/每次创建形态，lazy/prototype 以元数据参与、就绪单例附实例，绝不强制实例化；fail-closed。security 的注解启动校验基于此） |
 
 ## 坐标
 

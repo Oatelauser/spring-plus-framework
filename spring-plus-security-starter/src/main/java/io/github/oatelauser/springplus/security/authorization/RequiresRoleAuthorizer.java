@@ -1,5 +1,6 @@
 package io.github.oatelauser.springplus.security.authorization;
 
+import io.github.oatelauser.springplus.boot.process.BeanKind;
 import io.github.oatelauser.springplus.boot.process.HandleBeanPostProcessor.HandlerBean;
 import io.github.oatelauser.springplus.security.annotation.RequiresAdminRole;
 import io.github.oatelauser.springplus.security.annotation.RequiresRole;
@@ -87,15 +88,15 @@ public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer implement
     }
 
     // ========================= 启动期校验（fail-closed / CWE-862） =========================
-    // 经 boot 的 HandleBeanPostProcessor 在单例就绪后全量扫描（实现 HandlerBean），
-    // supportsBean 用默认值（全部 Bean 都可能贴 @RequiresRole，无预筛维度）
+    // 经 boot 的 HandleBeanPostProcessor 在单例就绪后全量扫描（实现 HandlerBean）：
+    // 校验只用 beanType 元数据，lazy/prototype 定义同样覆盖（bean 参数不使用）
 
     /**
      * 容器就绪后扫描全部 Bean 的 {@code @RequiresRole}（类级 + 方法级，含元注解归并）：
      * * {@code role = {}} 属"配了等于没配"的配置错误——启动期失败优于运行期静默放行/403 之谜。
      */
     @Override
-    public void handleBean(Class<?> beanType, Object bean) {
+    public void handleBean(BeanKind beanKind, Class<?> beanType, Object bean) {
         this.validateRequiresRole(beanType);
     }
 
