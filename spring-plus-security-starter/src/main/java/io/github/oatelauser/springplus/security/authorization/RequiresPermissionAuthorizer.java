@@ -1,7 +1,6 @@
 package io.github.oatelauser.springplus.security.authorization;
 
 import io.github.oatelauser.springplus.security.annotation.RequiresPermission;
-import io.github.oatelauser.springplus.security.annotation.RequiresRole;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -78,13 +77,13 @@ public class RequiresPermissionAuthorizer extends GrantedAuthorityAuthorizer imp
         for (String beanName : applicationContext.getBeanDefinitionNames()) {
             Class<?> beanType = applicationContext.getType(beanName);
             if (beanType != null) {
-                validate(beanType);
+                this.validateRequiresPermission(beanType);
             }
         }
     }
 
     /** 校验单个类上的 {@code @RequiresPermission}（类级 + 方法级），公开供测试直接调用 */
-    public void validate(Class<?> beanType) {
+    public void validateRequiresPermission(Class<?> beanType) {
         RequiresPermission classLevel = findMergedAnnotation(beanType, RequiresPermission.class);
         checkPermission(beanType, null, classLevel);
         ReflectionUtils.doWithMethods(beanType, method -> checkPermission(beanType,

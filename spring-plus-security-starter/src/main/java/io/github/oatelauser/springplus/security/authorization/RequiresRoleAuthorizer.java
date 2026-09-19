@@ -100,13 +100,13 @@ public class RequiresRoleAuthorizer extends GrantedAuthorityAuthorizer implement
         for (String beanName : applicationContext.getBeanDefinitionNames()) {
             Class<?> beanType = applicationContext.getType(beanName);
             if (beanType != null) {
-                validate(beanType);
+                this.validateRequiresRole(beanType);
             }
         }
     }
 
     /** 校验单个类上的 {@code @RequiresRole}（类级 + 方法级），公开供测试直接调用 */
-    public void validate(Class<?> beanType) {
+    public void validateRequiresRole(Class<?> beanType) {
         RequiresRole classLevel = findMergedAnnotation(beanType, RequiresRole.class);
         checkRole(beanType, null, classLevel);
         ReflectionUtils.doWithMethods(beanType, method -> checkRole(beanType,

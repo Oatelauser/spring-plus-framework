@@ -25,14 +25,14 @@ class AuthorizerStartupValidationTest {
     @Test
     void emptyRoleFailsAtStartup() {
         IllegalStateException ex = assertThrows(IllegalStateException.class,
-                () -> roleAuthorizer.validate(EmptyRoleSample.class));
+                () -> roleAuthorizer.validateRequiresRole(EmptyRoleSample.class));
         assertTrue(ex.getMessage().contains("@RequiresRole"), ex.getMessage());
     }
 
     @Test
     void validRolePassesSilently() {
-        assertDoesNotThrow(() -> roleAuthorizer.validate(ValidRoleSample.class));
-        assertDoesNotThrow(() -> roleAuthorizer.validate(PlainSample.class));
+        assertDoesNotThrow(() -> roleAuthorizer.validateRequiresRole(ValidRoleSample.class));
+        assertDoesNotThrow(() -> roleAuthorizer.validateRequiresRole(PlainSample.class));
     }
 
     // ───────────── @RequiresPermission（RequiresPermissionAuthorizer 自扫） ─────────────
@@ -40,19 +40,19 @@ class AuthorizerStartupValidationTest {
     @Test
     void blankPermissionFailsAtStartup() {
         IllegalStateException noSource = assertThrows(IllegalStateException.class,
-                () -> permissionAuthorizer.validate(BlankSourceSample.class));
+                () -> permissionAuthorizer.validateRequiresPermission(BlankSourceSample.class));
         assertTrue(noSource.getMessage().contains("source"), noSource.getMessage());
 
         IllegalStateException noAction = assertThrows(IllegalStateException.class,
-                () -> permissionAuthorizer.validate(BlankActionSample.class));
+                () -> permissionAuthorizer.validateRequiresPermission(BlankActionSample.class));
         assertTrue(noAction.getMessage().contains("action"), noAction.getMessage());
     }
 
     @Test
     void validPermissionPassesSilently() {
-        assertDoesNotThrow(() -> permissionAuthorizer.validate(ValidPermissionSample.class));
-        assertDoesNotThrow(() -> permissionAuthorizer.validate(PermissionOnlySample.class));
-        assertDoesNotThrow(() -> permissionAuthorizer.validate(PlainSample.class));
+        assertDoesNotThrow(() -> permissionAuthorizer.validateRequiresPermission(ValidPermissionSample.class));
+        assertDoesNotThrow(() -> permissionAuthorizer.validateRequiresPermission(PermissionOnlySample.class));
+        assertDoesNotThrow(() -> permissionAuthorizer.validateRequiresPermission(PlainSample.class));
     }
 
     // ───────────── 样本 ─────────────
