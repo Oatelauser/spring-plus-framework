@@ -54,26 +54,29 @@ public class HandleBeanPostProcessor implements BeanFactoryAware, SmartInitializ
 
     @Override
     public void afterSingletonsInstantiated() {
-        // getBeanDefinitionNames()：全定义覆盖（lazy/prototype 以元数据参与）；
         // 实例仅对已就绪的单例提供，绝不因扫描触发创建
         for (String beanName : this.beanFactory.getBeanDefinitionNames()) {
             BeanDefinition beanDefinition = this.beanFactory.getBeanDefinition(beanName);
             if (beanDefinition.isAbstract()) {
                 continue;
             }
-            BeanKind beanKind = beanDefinition.isSingleton()
-                    ? (beanDefinition.isLazyInit() ? BeanKind.LAZY : BeanKind.SINGLETON)
-                    : BeanKind.PROTOTYPE;
             Class<?> beanType = this.beanFactory.getType(beanName);
             if (beanType == null || HandlerBean.class.isAssignableFrom(beanType)) {
                 continue;
             }
+            BeanKind beanKind = getBeanKind(beanDefinition);
             Object bean = beanKind == BeanKind.SINGLETON && this.beanFactory.containsSingleton(beanName)
                     ? this.beanFactory.getBean(beanName) : null;
             for (HandlerBean handlerBean : this.handlerBeans) {
                 handlerBean.handleBean(beanKind, beanType, bean);
             }
         }
+    }
+
+    private static @NonNull BeanKind getBeanKind(BeanDefinition beanDefinition) {
+        return beanDefinition.isSingleton()
+                ? (beanDefinition.isLazyInit() ? BeanKind.LAZY : BeanKind.SINGLETON)
+                : BeanKind.PROTOTYPE;
     }
 
     /**
