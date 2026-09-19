@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.web.trace;
+package io.github.oatelauser.springplus.web.process;
 
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;

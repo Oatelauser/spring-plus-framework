@@ -2,7 +2,7 @@ package io.github.oatelauser.springplus.web.error.engine;
 
 import io.github.oatelauser.springplus.web.error.annotation.ExceptionResponse;
 import io.github.oatelauser.springplus.web.error.descriptor.OutputProtocol;
-import io.github.oatelauser.springplus.web.trace.HandlerMethodProcessor;
+import io.github.oatelauser.springplus.web.process.HandlerMethodProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

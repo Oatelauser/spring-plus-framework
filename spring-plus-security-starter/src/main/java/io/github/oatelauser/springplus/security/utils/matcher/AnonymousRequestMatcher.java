@@ -1,7 +1,7 @@
 package io.github.oatelauser.springplus.security.utils.matcher;
 
 import io.github.oatelauser.springplus.security.annotation.RequiresNonLogin;
-import io.github.oatelauser.springplus.web.trace.HandlerMethodProcessor;
+import io.github.oatelauser.springplus.web.process.HandlerMethodProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

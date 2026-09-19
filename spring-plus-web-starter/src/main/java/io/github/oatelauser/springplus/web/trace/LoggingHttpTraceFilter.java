@@ -1,6 +1,7 @@
 package io.github.oatelauser.springplus.web.trace;
 
 import io.github.oatelauser.springplus.boot.utils.LogSanitizer;
+import io.github.oatelauser.springplus.web.process.HandlerMethodProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Setter;

@@ -24,7 +24,8 @@ io.github.oatelauser.springplus.web
 ├── response/    响应与状态码（SimpleResponse / ServerStatus / Page / PageResponse / BasePageRequest / FieldErrorInfo）
 ├── error/       异常体系（annotation / descriptor / engine / mapper / output / sse 子包 + ServiceException）
 ├── stream/      流式响应写入器（原 servlet 包，名实修正）
-├── trace/       HTTP 请求追踪（原 process 包；@RecordHttp 注解同包）
+├── process/     HandlerMethod 扫描处理设施（HandlerMethodProcessor SPI + AnnotationHandlerMethodPostProcessor，供 trace/协议探测/security 白名单收集复用）
+├── trace/       HTTP 请求追踪（@RecordHttp 注解同包）
 ├── validation/  校验注解（field / collection / clazz 三层）
 ├── utils/       AssertUtils（运行时断言）/ JsonUtils；通用工具已迁 spring-plus-boot-starter 的 boot.utils（ADR 0003）
 └── autoconfigure/ SpringPlusWebAutoConfiguration / ExceptionHandlingAutoConfiguration / GlobalExceptionProperties

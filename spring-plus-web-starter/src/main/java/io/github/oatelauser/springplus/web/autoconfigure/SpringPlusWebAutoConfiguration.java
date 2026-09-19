@@ -1,6 +1,6 @@
 package io.github.oatelauser.springplus.web.autoconfigure;
 
-import io.github.oatelauser.springplus.web.trace.AnnotationHandlerMethodPostProcessor;
+import io.github.oatelauser.springplus.web.process.AnnotationHandlerMethodPostProcessor;
 import io.github.oatelauser.springplus.web.stream.HttpResponseWriter;
 import io.github.oatelauser.springplus.web.stream.HttpWriterFactory;
 import io.github.oatelauser.springplus.boot.utils.ApplicationContextHolder;

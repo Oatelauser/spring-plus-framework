@@ -1,4 +1,4 @@
-package io.github.oatelauser.springplus.web.trace;
+package io.github.oatelauser.springplus.web.process;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
