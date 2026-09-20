@@ -15,7 +15,11 @@ import java.util.function.Supplier;
 /**
  * 线程池工具类
  * <p>
- * 提供功能：1.线程池；2.fork/join线程池；3.线程池关闭
+ * 提供功能：1.创建命名线程的普通线程池；2.创建 fork/join 线程池；3.线程池的优雅关闭与任务完成等待；
+ * 4.fork/join 托管块（ManagedBlocker）封装
+ * <p>
+ * 通过本类创建的线程池会以 {@link WeakReference} 登记（防止临时线程池内存泄漏），
+ * JVM 退出时由关闭钩子统一优雅关闭，参考 log4j2 的 {@code ExecutorServices} 实现
  *
  * @author DearYang
  * @date 2022-04-27
@@ -71,57 +75,53 @@ public class ExecutorServices {
     }
 
     /**
-     * Shuts down the given {@link ExecutorService} in an orderly fashion. Disables new tasks from submission and then
-     * waits for existing tasks to terminate. Eventually cancels running tasks if too much time elapses.
-     * <p>
-     * If the timeout is 0, then a plain shutdown takes place.
+     * 优雅关闭给定的 {@link ExecutorService}：停止接收新任务，等待已提交任务执行完毕，
+     * 超时后强制取消正在执行的任务，超时时间默认 10 秒
      *
-     * @param executorService the pool to shutdown.
-     * @return {@code true} if the given executor terminated and {@code false} if the timeout elapsed before
-     * termination.
+     * @param executorService 待关闭的线程池
+     * @return true-线程池已终止；false-超时前未能终止
      */
     public static boolean shutdown(final ExecutorService executorService) {
         return shutdown(DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS, "", executorService);
     }
 
     /**
-     * Shuts down the given {@link ExecutorService} in an orderly fashion. Disables new tasks from submission and then
-     * waits for existing tasks to terminate. Eventually cancels running tasks if too much time elapses.
+     * 优雅关闭给定的 {@link ExecutorService}：先停止接收新任务，再等待已提交任务执行完毕，
+     * 超时后调用 {@code shutdownNow()} 强制取消正在执行的任务并再次等待
      * <p>
-     * If the timeout is 0, then a plain shutdown takes place.
-     * </p>
+     * 超时时间为 0 时，只停止接收新任务、不等待已有任务执行完毕
      *
-     * @param executorService the pool to shutdown.
-     * @param timeout         the maximum time to wait, or 0 to not wait for existing tasks to terminate.
-     * @param unit            the time unit of the timeout argument
-     * @param source          use this string in any log messages.
-     * @return {@code true} if the given executor terminated and {@code false} if the timeout elapsed before
-     * termination.
+     * @param executorService 待关闭的线程池
+     * @param timeout         最大等待时间，0 表示不等待
+     * @param unit            时间单位
+     * @param source          日志中标识调用来源的字符串
+     * @return true-线程池已终止；false-超时前未能终止
+     * @throws IllegalArgumentException timeout 为负数或 unit 为 null
      */
     public static boolean shutdown(long timeout, TimeUnit unit, String source, ExecutorService executorService) {
         if (executorService == null || executorService.isTerminated()) {
             return true;
         }
-        executorService.shutdown(); // Disable new tasks from being submitted
+        executorService.shutdown(); // 停止接收新任务
         if (timeout < 0 || unit == null) {
             throw new IllegalArgumentException(String.format("%s can't shutdown %s when timeout = %,d and timeUnit = %s.",
                     source, executorService, timeout, unit));
         }
         if (timeout > 0) {
             try {
-                // Wait a while for existing tasks to terminate
+                // 等待已提交任务执行完毕
                 if (!executorService.awaitTermination(timeout, unit)) {
-                    executorService.shutdownNow(); // Cancel currently executing tasks
-                    // Wait a while for tasks to respond to being cancelled
+                    executorService.shutdownNow(); // 取消正在执行的任务
+                    // 等待任务响应取消
                     if (!executorService.awaitTermination(timeout, unit)) {
                         log.error("{} pool {} did not terminate after {} {}", source, executorService, timeout, unit);
                     }
                     return false;
                 }
             } catch (final InterruptedException ie) {
-                // (Re-)Cancel if current thread also interrupted
+                // 当前线程被中断时（重新）取消任务
                 executorService.shutdownNow();
-                // Preserve interrupt status
+                // 保留中断状态
                 Thread.currentThread().interrupt();
             }
         } else {
