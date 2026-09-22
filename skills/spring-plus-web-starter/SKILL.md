@@ -40,6 +40,7 @@ description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.git
 | PageHelper / 自建 `PageResult` | 入参继承 `BasePageRequest`，返回 `PageResponse.ok(request, total, records)` |
 | 手写正则/hutool 校验手机号、枚举取值、集合元素 | `@Phone` / `@EnumValue(enumClass=...)` / `@ListValues({...})` / `@NoNullElement` / `@UniqueElement`（空值默认过，必填叠加 `@NotBlank`/`@NotNull`） |
 | `if (x == null) throw new BizException("...")` 样板 | `AssertUtils.notNull(x, BusinessStatus.DATA_NOT_EXIST)`（失败即 `ServiceException`） |
+| Controller 里 `if (startDate.isAfter(endDate)) return fail("...")` 式跨字段校验 | 进 DTO：类上裸贴 `@ClassValidator` + `implements Validatable`，`validate()` 用 `ValidationResult.builder().addFieldErrorIf(...)`（字段先判 null），错误走统一 violations 输出 |
 | 手写 `SseEmitter` + 自己 completeWithError | C 档 `sseConnectionFactory.open(request, executor).execute(task)` 零样板；错误映射贴 `@SseExceptionResponse` |
 | 手动操作 `HttpServletResponse` 输出流（下载/分块/NDJSON） | `HttpWriterFactory` 四件套：`download(...)` / `chunk(...)` / `ndjson(...)` / `sse(...)` |
 | `@PreAuthorize("@ss.hasRole('x')")` SpEL 鉴权 | 归 security 模块：`@RequiresRole` / `@RequiresPermission`（加载 spring-plus-security-starter） |
@@ -68,7 +69,7 @@ description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.git
 
 1. Controller 返回值一律 `SimpleResponse<T>` / `PageResponse<T>`，无数据用 `SimpleResponse<Void>`；不裸返 String/Long/Boolean/List，不自建 `Result`/`ApiResponse` 平行封装
 2. 分页：入参继承 `BasePageRequest`，返回 `PageResponse.ok(request, total, records)`（total 在前）
-3. "不成立即抛业务异常"的判断用 `AssertUtils` 收敛，不写 if + throw
+3. "不成立即抛业务异常"的判断用 `AssertUtils` 收敛，不写 if + throw；**入参的跨字段/一致性校验进 DTO 的 `@ClassValidator` 类级校验器**（`implements Validatable`），不写在 Controller 的 if 里
 4. 错误响应不手工构造：抛类型化异常（自带映射或注解声明），让全局体系渲染
 5. JSON 一律走 `JsonUtils`，禁止业务代码自建 `JsonMapper`/`ObjectMapper`
 6. 业务/模块自带 `@RestControllerAdvice` 必须满足：只声明窄异常类型 + 显式 `@Order`（0~900）；要渲染就构造 `ErrorDescriptor` 交 `ExceptionOutputEngine.dispatch(...)`，不自己写响应体
@@ -86,6 +87,7 @@ description: spring-plus-framework 的 Web 层能力使用约定（坐标 io.git
 
 - `@Valid @RequestBody` 在 Spring 7 是 fail-fast，violations 只有单条；非 body 参数校验聚合全部结果（`references/validation.md`）
 - `@Phone`/`@EnumValue` 空值默认通过，必填须叠加 `@NotBlank`/`@NotNull`（`references/validation.md`）
+- `@ClassValidator` 的 `validate()` 必须自写 null 守卫：`fail-fast=false` 时字段校验失败后类级 `validate()` 仍会执行，null 字段 NPE 会变成泄漏内部签名的违规消息（`references/validation.md`）
 - `spring.jackson.datetime-format`/`time-format`/`long-to-string` 是框架扩展键，Boot 官方文档查不到；`long-to-string` 默认关（`references/json-and-assert.md`）
 - 模块 advice 声明 `Exception`/`Throwable` 兜底会**静默遮蔽**全局全部具体 handler、无显式 `@Order` 时与兜底平局（先后由注册顺序决定）——纯约定，无启动期校验（`references/exception-handling.md`）
 - 敏感键日志掩码只覆盖 `LogSanitizer` 默认键集，自定义业务敏感字段需评估扩展（`boot-starter` 的 utils）
