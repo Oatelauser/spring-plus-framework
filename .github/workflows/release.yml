@@ -45,6 +45,15 @@ jobs:
           </settings>
           EOF
 
+      # tag 名去掉 v 前缀回填全模块 pom 版本（versions:set 联动所有 <parent><version>）。
+      # pom 平时停在 SNAPSHOT 不必手动 bump——Central 不收 SNAPSHOT，打什么 tag 就发什么版本
+      - name: Set release version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "Releasing version: ${VERSION}"
+          mvn -B org.codehaus.mojo:versions-maven-plugin:2.18.0:set \
+            -DnewVersion="${VERSION}" -DgenerateBackupPoms=false
+
       - name: Build, sign and deploy
         run: mvn -B -P release deploy
 
